@@ -1,13 +1,18 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"github.com/454270186/GoTikTok/cmd/handler"
+	"github.com/gin-gonic/gin"
+)
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 
+	userHandler := handler.NewUserHandler()
+	
 	rUser := r.Group("/douyin/user")
 	{	
-		rUser.POST("/register", func(ctx *gin.Context) {})
+		rUser.POST("/register", userHandler.Register)
 		rUser.POST("/login", func(ctx *gin.Context) {})
 		rUser.GET("/", func(ctx *gin.Context) {})
 	}

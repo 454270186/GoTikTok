@@ -22,8 +22,8 @@ services:
       - 8091:3306
     environment:
       - MYSQL_DATABASE=Tiktok
-      - MYSQL_USER=tiktok
-      - MYSQL_PASSWORD=password
+      - MYSQL_USER=xiaofei
+      - MYSQL_PASSWORD=2021110003
       - MYSQL_RANDOM_ROOT_PASSWORD="yes"
 
   Etcd:
