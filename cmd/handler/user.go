@@ -57,5 +57,6 @@ func (u UserHandler) Register(c *gin.Context) {
 		"status_code": 0,
 		"status_msg": "user register successfully",
 		"user_id": resp.UserId,
+		"token": "sssssssssssssss",
 	})
 }
