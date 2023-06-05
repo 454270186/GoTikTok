@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package feed;
+
+option go_package = "./feed";
+
+message User {
+    int64 id = 1;
+    string name = 2;
+    int64 follow_count = 3;
+    int64 follower_count = 4;
+    bool is_follow = 5;
+}
+
+message Video {
+    int64 id = 1;
+    User author = 2;
+    string play_url = 3;
+    string cover_url = 4;
+    int64 favorite_count = 5;
+    int64 comment_count = 6;
+    bool is_favorite = 7;
+    string title = 8;
+}
+
+message FeedReq {
+    int64 LastestTime = 1;
+}
+
+message FeedRes {
+    int32 statusCode = 1;
+    repeated Video videoList = 2;
+    int64 nextTime = 3;
+}
+
+service FeedService {
+    rpc GetUserFeed(FeedReq) returns(FeedRes);
+}
