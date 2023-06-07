@@ -18,7 +18,7 @@ func newDB() *gorm.DB {
 }
 
 func initDB() *gorm.DB {
-	dsn := "xiaofei:2021110003@tcp(127.0.0.1:8091)/Tiktok"
+	dsn := "xiaofei:2021110003@tcp(127.0.0.1:8091)/Tiktok?parseTime=true"
 
 	DB, err := gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {

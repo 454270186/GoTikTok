@@ -2,6 +2,7 @@ package main
 
 import (
 	"github.com/454270186/GoTikTok/cmd/handler"
+	"github.com/454270186/GoTikTok/pkg/middleware"
 	"github.com/gin-gonic/gin"
 )
 
@@ -14,7 +15,7 @@ func NewRouter() *gin.Engine {
 	{	
 		rUser.POST("/register/", userHandler.Register)
 		rUser.POST("/login/", func(ctx *gin.Context) {})
-		rUser.GET("/", func(ctx *gin.Context) {})
+		rUser.GET("/", middleware.VerifyToken(), userHandler.GetUser)
 	}
 
 	rPublish := r.Group("/douyin/publish")
