@@ -20,6 +20,8 @@ message RegisterReq {
 message RegisterRes {
     int32 statusCode = 1;
     string userId = 2;
+    string token=3;
+    string refresh_token=4;
 }
 
 message LoginReq {
