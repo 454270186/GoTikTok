@@ -10,18 +10,19 @@ func NewRouter() *gin.Engine {
 	r := gin.Default()
 
 	userHandler := handler.NewUserHandler()
+	publishHandler := handler.NewPubHandler()
 	
 	rUser := r.Group("/douyin/user")
 	{	
 		rUser.POST("/register/", userHandler.Register)
-		rUser.POST("/login/", func(ctx *gin.Context) {})
+		rUser.POST("/login/", userHandler.Login)
 		rUser.GET("/", middleware.VerifyToken(), userHandler.GetUser)
 	}
 
 	rPublish := r.Group("/douyin/publish")
 	{
-		rPublish.GET("/list", func(ctx *gin.Context) {})
-		rPublish.POST("/action", func(ctx *gin.Context) {})
+		rPublish.GET("/list/", middleware.VerifyToken(), publishHandler.List)
+		rPublish.POST("/action/", func(ctx *gin.Context) {})
 	}
 
 	rFeed := r.Group("/douyin/feed")

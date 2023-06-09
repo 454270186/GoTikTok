@@ -32,40 +32,42 @@ func VerifyToken() gin.HandlerFunc {
 				return secretKey, nil
 			})
 
-			if token.Valid {
-				c.Next()
-			} else if errors.Is(err, jwt.ErrTokenExpired) {
-				c.AbortWithStatusJSON(http.StatusUnauthorized, 
+			if err != nil || !token.Valid {
+				c.AbortWithStatusJSON(http.StatusUnauthorized,
 					gin.H{
 						"status_code": -1,
-						"status_msg": "token has expried",
+						"status_msg":  "invalid token",
 					},
 				)
+				return
 			}
-
+	
 			mapClaim, ok := token.Claims.(jwt.MapClaims)
 			if !ok {
-				log.Println("error while access mapclaims")
+				log.Println("error while accessing mapclaims")
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 					"status_code": -1,
-					"status_msg": "unexpect internal error",
+					"status_msg":  "unexpected internal error",
 				})
+				return
 			}
-
+	
 			idFromToken := mapClaim["id"]
 			userid, err := strconv.ParseFloat(c.Query("user_id"), 64)
 			if err != nil {
 				c.AbortWithError(http.StatusBadRequest, err)
+				return
 			}
-			
+	
 			if idFromToken != userid {
-				log.Println("hshsshshshshs")
+				log.Println("user id does not match")
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
 					"status_code": -1,
-					"status_msg": "user id does not match",
+					"status_msg":  "user id does not match",
 				})
+				return
 			}
-
+	
 			c.Next()
 		}
 	}
