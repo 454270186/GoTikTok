@@ -39,6 +39,7 @@ func VerifyToken() gin.HandlerFunc {
 						"status_msg":  "invalid token",
 					},
 				)
+				
 				return
 			}
 	
