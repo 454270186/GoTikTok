@@ -11,6 +11,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+// Verify token
 func VerifyToken() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenStr := c.Query("token")
