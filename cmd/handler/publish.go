@@ -50,3 +50,7 @@ func (p PublishHandler) List(c *gin.Context) {
 		"video_list": resp.VideoList,
 	})
 }
+
+func (p PublishHandler) Action(c *gin.Context) {
+	
+}

@@ -22,7 +22,7 @@ func NewRouter() *gin.Engine {
 	rPublish := r.Group("/douyin/publish")
 	{
 		rPublish.GET("/list/", middleware.VerifyToken(), publishHandler.List)
-		rPublish.POST("/action/", func(ctx *gin.Context) {})
+		rPublish.POST("/action/", middleware.VerifyToken(), publishHandler.Action)
 	}
 
 	rFeed := r.Group("/douyin/feed")

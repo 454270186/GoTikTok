@@ -53,23 +53,25 @@ func VerifyToken() gin.HandlerFunc {
 				})
 				return
 			}
-	
-			idFromToken := mapClaim["id"]
-			userid, err := strconv.ParseFloat(c.Query("user_id"), 64)
-			if err != nil {
-				c.AbortWithError(http.StatusBadRequest, err)
-				return
+			
+			if useridStr := c.Query("user_id"); useridStr != "" {
+				idFromToken := mapClaim["id"]
+				userid, err := strconv.ParseFloat(useridStr, 64)
+				if err != nil {
+					c.AbortWithError(http.StatusBadRequest, err)
+					return
+				}
+			
+				if idFromToken != userid {
+					log.Println("user id does not match")
+					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+						"status_code": -1,
+						"status_msg":  "user id does not match",
+					})
+					return
+				}
 			}
-	
-			if idFromToken != userid {
-				log.Println("user id does not match")
-				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-					"status_code": -1,
-					"status_msg":  "user id does not match",
-				})
-				return
-			}
-	
+
 			c.Next()
 		}
 	}
