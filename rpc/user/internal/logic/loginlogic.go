@@ -7,6 +7,7 @@ import (
 	"github.com/454270186/GoTikTok/pkg/auth"
 	"github.com/454270186/GoTikTok/rpc/user/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
+	"golang.org/x/crypto/bcrypt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -36,6 +37,18 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginRes, error) {
 		return &user.LoginRes{
 			StatusCode: -1,
 		}, nil
+	}
+
+	dalUser, err := UserDB.GetById(l.ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	err = bcrypt.CompareHashAndPassword([]byte(dalUser.Password), []byte(in.Password))
+	if err != nil {
+		return &user.LoginRes{
+			StatusCode: -1,
+		}, err
 	}
 
 	token, _ := auth.NewTokenByUserID(userID)
