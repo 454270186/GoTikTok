@@ -31,11 +31,11 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 
 func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error) {
 	// encoded user's password
-	encryted, _ := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
+	encrypted, _ := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
 
 	newUser := dal.User{
 		Username: in.Username,
-		Password: string(encryted),
+		Password: string(encrypted),
 	}
 
 	err := UserDB.CreateUser(l.ctx, &newUser)
