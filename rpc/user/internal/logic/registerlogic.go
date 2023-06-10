@@ -10,7 +10,6 @@ import (
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
 
 	"github.com/zeromicro/go-zero/core/logx"
-	"golang.org/x/crypto/bcrypt"
 )
 
 var UserDB dal.UserDB
@@ -31,7 +30,7 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 
 func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error) {
 	// encoded user's password
-	encrypted, _ := bcrypt.GenerateFromPassword([]byte(in.Password), bcrypt.DefaultCost)
+	encrypted, _ := auth.GetHashedPwd(in.Password)
 
 	newUser := dal.User{
 		Username: in.Username,

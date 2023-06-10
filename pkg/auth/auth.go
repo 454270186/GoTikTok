@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/golang-jwt/jwt/v5"
+	"golang.org/x/crypto/bcrypt"
 )
 
 const (
@@ -24,4 +25,22 @@ func NewTokenByUserID(userId uint) (string, string) {
 	}
 
 	return tokenSignedStr, ""
+}
+
+func GetHashedPwd(pwd string) ([]byte, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
+	if err != nil {
+		return nil, err
+	}
+
+	return hash, nil
+}
+
+func ComparePwd(hashedPwd string, pwd string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hashedPwd), []byte(pwd))
+	if err != nil {
+		return false
+	} else {
+		return true
+	}
 }

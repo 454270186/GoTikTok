@@ -2,12 +2,12 @@ package logic
 
 import (
 	"context"
+	"errors"
 	"strconv"
 
 	"github.com/454270186/GoTikTok/pkg/auth"
 	"github.com/454270186/GoTikTok/rpc/user/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
-	"golang.org/x/crypto/bcrypt"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -44,12 +44,12 @@ func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginRes, error) {
 		return nil, err
 	}
 
-	err = bcrypt.CompareHashAndPassword([]byte(dalUser.Password), []byte(in.Password))
-	if err != nil {
+	if isPwdOK := auth.ComparePwd(dalUser.Password, in.Password); !isPwdOK {
 		return &user.LoginRes{
 			StatusCode: -1,
-		}, err
+		}, errors.New("wrong password")
 	}
+	
 
 	token, _ := auth.NewTokenByUserID(userID)
 	if token == "" {
