@@ -64,7 +64,7 @@ func UploadFile(bucketName string, objectName string, reader io.Reader, objectSi
 func GetFileURL(bucketName string, fileName string, exp time.Duration) (*url.URL, error) {
 	ctx := context.Background()
 	reqParams := make(url.Values)
-	if exp < 0 {
+	if exp < 1 {
 		exp = time.Second * 60 * 60 * 24
 	}
 
