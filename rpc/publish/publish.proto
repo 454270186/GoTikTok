@@ -35,6 +35,7 @@ message PublishListRes {
 message PublishActionReq {
     bytes data = 1;
     string title = 2;
+    int64 uid = 3;
 }
 
 message PublishActionRes {
