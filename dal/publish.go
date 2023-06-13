@@ -46,3 +46,7 @@ func (p PublishDB) GetListByID(ctx context.Context, userID uint) ([]*Video, erro
 
 	return videoList, nil
 }
+
+func (p PublishDB) CreateVideo(ctx context.Context, video *Video) error {
+	return p.DB.WithContext(ctx).Create(video).Error
+}

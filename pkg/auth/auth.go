@@ -1,6 +1,7 @@
 package auth
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -27,6 +28,9 @@ func NewTokenByUserID(userId uint) (string, string) {
 	return tokenSignedStr, ""
 }
 
+/*
+	Password Crypting
+*/
 func GetHashedPwd(pwd string) ([]byte, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pwd), bcrypt.DefaultCost)
 	if err != nil {
@@ -43,4 +47,30 @@ func ComparePwd(hashedPwd string, pwd string) bool {
 	} else {
 		return true
 	}
+}
+
+/*
+	Token Parser
+*/
+func GetUIDFromToken(tokenStr string) (uint, error) {
+	token, err := jwt.Parse(tokenStr, func(t *jwt.Token) (interface{}, error) {
+		secretKey := []byte(HMACSECRET)
+
+		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, errors.New("unexpect signing method")
+		}
+
+		return secretKey, nil
+	})
+
+	if err != nil || !token.Valid {
+		return 0, errors.New("invalid token")
+	}
+
+	mapClaims, ok := token.Claims.(jwt.MapClaims)
+	if !ok {
+		return 0, errors.New("error while accessing mapclaims")
+	}
+
+	return mapClaims["id"].(uint), nil
 }
