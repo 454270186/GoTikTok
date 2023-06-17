@@ -3,22 +3,9 @@ package dal
 import (
 	"context"
 	"log"
-	"time"
 
 	"gorm.io/gorm"
 )
-
-type Video struct {
-	ID            uint   `gorm:"primarykey"`
-	AuthorID      uint   `gorm:"column:author_id"`
-	PlayURL       string `gorm:"column:play_url"`
-	CoverURL      string `gorm:"column:cover_url"`
-	FavoriteCount int64  `gorm:"column:favorite_count"`
-	CommentCount  int64  `gorm:"column:comment_count"`
-	Title         string `gorm:"column:title"`
-	CreatedAt     time.Time
-	UpdatedAt     time.Time
-}
 
 func (v Video) GetTableName() string {
 	return "videos"

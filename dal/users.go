@@ -2,24 +2,9 @@ package dal
 
 import (
 	"context"
-	"time"
 
 	"gorm.io/gorm"
 )
-
-type User struct {
-	ID             uint   `gorm:"primarykey"`
-	Username       string `gorm:"column:user_name"`
-	Password       string `gorm:"column:password"`
-	FollowingCount int64  `gorm:"default:0;column:following_count"`
-	FollowerCount  int64  `gorm:"default:0;column:follower_count"`
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-}
-
-func (u User) GetTableName() string {
-	return "users"
-}
 
 type UserDB struct {
 	DB *gorm.DB
