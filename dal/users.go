@@ -2,7 +2,6 @@ package dal
 
 import (
 	"context"
-	"database/sql"
 	"time"
 
 	"gorm.io/gorm"
@@ -16,7 +15,6 @@ type User struct {
 	FollowerCount  int64  `gorm:"default:0;column:follower_count"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
-	DeletedAt      sql.NullTime `gorm:"index"`
 }
 
 func (u User) GetTableName() string {
