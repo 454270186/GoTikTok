@@ -11,6 +11,7 @@ func NewRouter() *gin.Engine {
 
 	userHandler := handler.NewUserHandler()
 	publishHandler := handler.NewPubHandler()
+	feefHandler := handler.NewFeedHandler()
 	
 	rUser := r.Group("/douyin/user")
 	{	
@@ -22,36 +23,12 @@ func NewRouter() *gin.Engine {
 	rPublish := r.Group("/douyin/publish")
 	{
 		rPublish.GET("/list/", middleware.VerifyToken(), publishHandler.List)
-		rPublish.POST("/action/", middleware.VerifyToken(), publishHandler.Action)
+		rPublish.POST("/action/", publishHandler.Action)
 	}
 
 	rFeed := r.Group("/douyin/feed")
 	{
-		rFeed.GET("/", func(ctx *gin.Context) {
-			ctx.String(200, `{
-				"status_code": 0,
-				"status_msg": "string",
-				"next_time": 0,
-				"video_list": [
-					{
-						"id": 0,
-						"author": {
-							"id": 0,
-							"name": "string",
-							"follow_count": 0,
-							"follower_count": 0,
-							"is_follow": true
-						},
-						"play_url": "string",
-						"cover_url": "string",
-						"favorite_count": 0,
-						"comment_count": 0,
-						"is_favorite": true,
-						"title": "string"
-					}
-				]
-			}`)
-		})
+		rFeed.GET("/", middleware.VerifyToken(), feefHandler.GetUserFeed) 
 	}
 
 	return r

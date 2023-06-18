@@ -4,7 +4,7 @@ import "time"
 
 type User struct {
 	ID             uint   `gorm:"primarykey"`
-	Username       string `gorm:"column:user_name"`
+	Username       string `gorm:"column:username"`
 	Password       string `gorm:"column:password"`
 	FollowingCount int64  `gorm:"default:0;column:following_count"`
 	FollowerCount  int64  `gorm:"default:0;column:follower_count"`

@@ -17,6 +17,7 @@ func NewFeedDB() FeedDB {
 	}
 }
 
+// 
 func (f FeedDB) GetVideoLists(ctx context.Context, limit int, latestTime int64) ([]*Video, error) {
 	videos := make([]*Video, 0)
 
@@ -25,7 +26,7 @@ func (f FeedDB) GetVideoLists(ctx context.Context, limit int, latestTime int64) 
 		latestTime = curTime
 	}
 
-	err := f.DB.WithContext(ctx).Limit(limit).Find(&videos, "update_at < ?", time.UnixMilli(latestTime)).Error
+	err := f.DB.WithContext(ctx).Limit(limit).Order("updated_at DESC").Find(&videos, "updated_at < ?", time.UnixMilli(latestTime)).Error
 	if err != nil {
 		return nil, err
 	}

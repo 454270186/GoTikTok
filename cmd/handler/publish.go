@@ -57,8 +57,9 @@ func (p PublishHandler) List(c *gin.Context) {
 func (p PublishHandler) Action(c *gin.Context) {
 	title := c.PostForm("title")
 	tokenStr := c.PostForm("token")
-	fileHeader, err := c.FormFile("file")
+	fileHeader, err := c.FormFile("data")
 	if err != nil {
+		log.Println(err, "1111")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status_code": -1,
 			"status_msg": err.Error(),
@@ -66,8 +67,11 @@ func (p PublishHandler) Action(c *gin.Context) {
 		return
 	}
 
+	log.Println(title, tokenStr)
+
 	file, err := fileHeader.Open()
 	if err != nil {
+		log.Println(err, "2222")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status_code": -1,
 			"status_msg": err.Error(),
@@ -78,6 +82,7 @@ func (p PublishHandler) Action(c *gin.Context) {
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
+		log.Println(err, "3333")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status_code": -1,
 			"status_msg": err.Error(),
@@ -88,6 +93,7 @@ func (p PublishHandler) Action(c *gin.Context) {
 	// get user id from token
 	uid, err := auth.GetUIDFromToken(tokenStr)
 	if err != nil {
+		log.Println(err, "4444")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status_code": -1,
 			"status_msg": err.Error(),
@@ -101,8 +107,9 @@ func (p PublishHandler) Action(c *gin.Context) {
 		Uid: int64(uid),
 	}
 	
-	resp, err := p.pubRpcCli.PublishAction(context.Background(), &in)
+	resp, err := p.pubRpcCli.PublishAction(c.Copy(), &in)
 	if err != nil {
+		log.Println(err, "5555")
 		c.JSON(http.StatusBadRequest, gin.H{
 			"status_code": -1,
 			"status_msg": err.Error(),

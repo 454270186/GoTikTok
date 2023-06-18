@@ -10,7 +10,7 @@ func NewFeedCli() feedservice.FeedService {
 	conn := zrpc.MustNewClient(zrpc.RpcClientConf{
 		Etcd: discov.EtcdConf{
 			Hosts: []string{"127.0.0.1:2379"},
-			Key: "feeed.rpc",
+			Key: "feed.rpc",
 		},
 	})
 

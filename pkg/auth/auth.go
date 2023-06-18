@@ -72,5 +72,5 @@ func GetUIDFromToken(tokenStr string) (uint, error) {
 		return 0, errors.New("error while accessing mapclaims")
 	}
 
-	return mapClaims["id"].(uint), nil
+	return uint(mapClaims["id"].(float64)), nil
 }

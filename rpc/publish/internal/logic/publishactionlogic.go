@@ -3,11 +3,11 @@ package logic
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"image"
 	"image/jpeg"
-	"os"
-	"strings"
+	"log"
 
 	"github.com/454270186/GoTikTok/dal"
 	"github.com/454270186/GoTikTok/pkg/minio"
@@ -47,15 +47,17 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 	fileName := u2.String() + "." + "mp4"
 	err = minio.UploadFile(MinioVideoBucketName, fileName, reader, int64(len(videoData)))
 	if err != nil {
-		return nil, err
+		// return nil, err
+		return nil, errors.New("minio.UploadFile")
 	}
 
 	// get video url
 	url, err := minio.GetFileURL(MinioVideoBucketName, fileName, 0)
 	if err != nil {
-		return nil, err
+		// return nil, err
+		return nil, errors.New("minio.GetFileURL")
 	}
-	playUrl := strings.Split(url.String(), "?")[0]
+	//playUrl := strings.Split(url.String(), "?")[0]
 
 	// get cover from video stream
 	u3, err := uuid.NewV4()
@@ -63,9 +65,9 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 		return nil, err
 	}
 
-	coverData, err := getOneFrameAsJpeg(playUrl)
+	coverData, err := getOneFrameAsJpeg(url.String())
 	if err != nil {
-		return nil, err
+		return nil, errors.New("ffmpeg error")
 	}
 
 	// upload cover
@@ -82,13 +84,13 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 		return nil, err
 	}
 
-	coverUrl := strings.Split(coverURL.String(), "?")[0]
+	// coverUrl := strings.Split(coverURL.String(), "?")[0]
 
 	// store in database
 	videoModel := dal.Video{
 		AuthorID: uint(in.Uid),
-		PlayURL: playUrl,
-		CoverURL: coverUrl,
+		PlayURL: url.String(),
+		CoverURL: coverURL.String(),
 		FavoriteCount: 0,
 		CommentCount: 0,
 		Title: in.Title,
@@ -106,9 +108,10 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 // 从视频流中截取一帧作为封面
 func getOneFrameAsJpeg(playUrl string) ([]byte, error) {
 	reader := bytes.NewBuffer(nil)
+	log.Println(playUrl)
 	err := ffmpeg.Input(playUrl).Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", 1)}).
 		   		  Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
-				  WithOutput(reader, os.Stdout).Run()
+				  WithOutput(reader).Run()
 	if err != nil {
 		return nil, err
 	}
