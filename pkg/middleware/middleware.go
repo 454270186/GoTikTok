@@ -4,7 +4,6 @@ import (
 	"errors"
 	"log"
 	"net/http"
-	"strconv"
 
 	"github.com/454270186/GoTikTok/pkg/auth"
 	"github.com/gin-gonic/gin"
@@ -44,7 +43,7 @@ func VerifyToken() gin.HandlerFunc {
 				return
 			}
 	
-			mapClaim, ok := token.Claims.(jwt.MapClaims)
+			_, ok := token.Claims.(jwt.MapClaims)
 			if !ok {
 				log.Println("error while accessing mapclaims")
 				c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
@@ -54,23 +53,23 @@ func VerifyToken() gin.HandlerFunc {
 				return
 			}
 			
-			if useridStr := c.Query("user_id"); useridStr != "" {
-				idFromToken := mapClaim["id"]
-				userid, err := strconv.ParseFloat(useridStr, 64)
-				if err != nil {
-					c.AbortWithError(http.StatusBadRequest, err)
-					return
-				}
+			// if useridStr := c.Query("user_id"); useridStr != "" {
+			// 	idFromToken := mapClaim["id"]
+			// 	userid, err := strconv.ParseFloat(useridStr, 64)
+			// 	if err != nil {
+			// 		c.AbortWithError(http.StatusBadRequest, err)
+			// 		return
+			// 	}
 			
-				if idFromToken != userid {
-					log.Println("user id does not match")
-					c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
-						"status_code": -1,
-						"status_msg":  "user id does not match",
-					})
-					return
-				}
-			}
+			// 	if idFromToken != userid {
+			// 		log.Println("user id does not match")
+			// 		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{
+			// 			"status_code": -1,
+			// 			"status_msg":  "user id does not match",
+			// 		})
+			// 		return
+			// 	}
+			// }
 
 			c.Next()
 		}
