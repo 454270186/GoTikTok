@@ -32,7 +32,7 @@ func (u UserDB) GetById(ctx context.Context, userId uint) (*User, error) {
 
 func (u UserDB) IsUserExist(ctx context.Context, username string) (uint, bool, error) {
 	var user User
-	err := u.DB.WithContext(ctx).Where("user_name = ?", username).First(&user).Error
+	err := u.DB.WithContext(ctx).Where("username = ?", username).First(&user).Error
 	if err != nil {
 		if err == gorm.ErrRecordNotFound {
 			return 0, false, nil
