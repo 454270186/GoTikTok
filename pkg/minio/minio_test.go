@@ -22,7 +22,7 @@ func TestUploadFile(t *testing.T) {
 
 	fileInfo, _ := os.Stat("./test.mp4")
 
-	err := UploadFile("tiktoktest", "test.mp4", file, fileInfo.Size())
+	err := UploadFile("tiktoktest", "test.mp4", file, fileInfo.Size(), "application/mp4")
 	log.Println(err)
 }
 

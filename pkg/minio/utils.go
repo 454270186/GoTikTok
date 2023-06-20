@@ -47,10 +47,10 @@ func UploadLocalFile(buckName string, objectName string, filePath string, conten
 }
 
 // Upload file
-func UploadFile(bucketName string, objectName string, reader io.Reader, objectSize int64) error {
+func UploadFile(bucketName string, objectName string, reader io.Reader, objectSize int64, contentType string) error {
 	ctx := context.Background()
 	n, err := minioClient.PutObject(ctx, bucketName, objectName, reader, objectSize, minio.PutObjectOptions{
-		ContentType: "application/octet-stream",
+		ContentType: contentType,
 	})
 	if err != nil {
 		log.Println("upload failed: ", err.Error())
@@ -63,12 +63,11 @@ func UploadFile(bucketName string, objectName string, reader io.Reader, objectSi
 
 func GetFileURL(bucketName string, fileName string, exp time.Duration) (*url.URL, error) {
 	ctx := context.Background()
-	reqParams := make(url.Values)
 	if exp < 1 {
 		exp = time.Second * 60 * 60 * 24
 	}
 
-	preSignedUrl, err := minioClient.PresignedGetObject(ctx, bucketName, fileName, exp, reqParams)
+	preSignedUrl, err := minioClient.PresignedGetObject(ctx, bucketName, fileName, exp, nil)
 	if err != nil {
 		log.Printf("get url of file %s from bucket %s failed: %s\n", fileName, bucketName, err.Error())
 		return nil, err
