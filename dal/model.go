@@ -23,3 +23,8 @@ type Video struct {
 	CreatedAt     time.Time
 	UpdatedAt     time.Time
 }
+
+type Favorite struct {
+	UserID  uint `gorm:"primaryKey;column:user_id"`
+	VideoID uint `gorm:"primaryKey;column:video_id"`
+}
