@@ -12,6 +12,7 @@ func NewRouter() *gin.Engine {
 	userHandler := handler.NewUserHandler()
 	publishHandler := handler.NewPubHandler()
 	feefHandler := handler.NewFeedHandler()
+	favoriteHandler := handler.NewFavHandler()
 	
 	rUser := r.Group("/douyin/user")
 	{	
@@ -29,6 +30,12 @@ func NewRouter() *gin.Engine {
 	rFeed := r.Group("/douyin/feed")
 	{
 		rFeed.GET("/", middleware.VerifyToken(), feefHandler.GetUserFeed) 
+	}
+
+	rFavorite := r.Group("/douyin/favorite")
+	{
+		rFavorite.GET("/list/", middleware.VerifyToken(), favoriteHandler.List)
+		rFavorite.POST("/action/", middleware.VerifyToken(), favoriteHandler.Action)
 	}
 
 	return r
