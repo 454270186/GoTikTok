@@ -5,6 +5,7 @@ import (
 	"strconv"
 
 	"github.com/454270186/GoTikTok/dal"
+	"github.com/454270186/GoTikTok/dal/pack"
 	"github.com/454270186/GoTikTok/pkg/auth"
 	"github.com/454270186/GoTikTok/rpc/user/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
@@ -32,30 +33,23 @@ func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error
 	// encoded user's password
 	encrypted, _ := auth.GetHashedPwd(in.Password)
 
-	newUser := dal.User{
-		Username: in.Username,
-		Password: string(encrypted),
-	}
-
-	err := UserDB.CreateUser(l.ctx, &newUser)
+	newUserID, err := pack.CreateNewUser(in.Username, string(encrypted))
 	if err != nil {
-		return &user.RegisterRes{
-			StatusCode: -1,
-		}, err
+		return nil, err
 	}
 
-	token, _ := auth.NewTokenByUserID(newUser.ID)
+	token, _ := auth.NewTokenByUserID(newUserID)
 	if token == "" {
 		return &user.RegisterRes{
 			StatusCode: -1,
-			UserId: strconv.FormatUint(uint64(newUser.ID), 10),
+			UserId: strconv.FormatUint(uint64(newUserID), 10),
 			Token: "",
 		}, nil
 	}
 
 	return &user.RegisterRes{
 		StatusCode: 0,
-		UserId: strconv.FormatUint(uint64(newUser.ID), 10),
+		UserId: strconv.FormatUint(uint64(newUserID), 10),
 		Token: token,
 	}, nil
 }

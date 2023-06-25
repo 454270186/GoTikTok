@@ -4,6 +4,7 @@ import (
 	"context"
 	"strconv"
 
+	"github.com/454270186/GoTikTok/dal/pack"
 	"github.com/454270186/GoTikTok/rpc/user/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
 
@@ -31,20 +32,25 @@ func (l *GetUserByIdLogic) GetUserById(in *user.GetUserReq) (*user.GetUserRes, e
 		return nil, err
 	}
 
-	DBUser, err := UserDB.GetById(l.ctx, uint(userId))
+	// DBUser, err := UserDB.GetById(l.ctx, uint(userId))
+	// if err != nil {
+	// 	return nil, err
+	// }
+
+	// gotUser := user.User{
+	// 	Id: int64(DBUser.ID),
+	// 	Name: DBUser.Username,
+	// 	FollowCount: DBUser.FollowerCount,
+	// 	FollowerCount: DBUser.FollowerCount,
+	// }
+
+	gotUser, err := pack.GetUserByID(userId)
 	if err != nil {
 		return nil, err
 	}
 
-	gotUser := user.User{
-		Id: int64(DBUser.ID),
-		Name: DBUser.Username,
-		FollowCount: DBUser.FollowerCount,
-		FollowerCount: DBUser.FollowerCount,
-	}
-
 	return &user.GetUserRes{
 		StatusCode: 0,
-		User: &gotUser,
+		User: gotUser,
 	}, nil
 }
