@@ -8,8 +8,9 @@ import (
 	"image"
 	"image/jpeg"
 	"log"
+	"os"
 
-	"github.com/454270186/GoTikTok/dal"
+	"github.com/454270186/GoTikTok/dal/pack"
 	"github.com/454270186/GoTikTok/pkg/minio"
 	"github.com/454270186/GoTikTok/rpc/publish/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/publish/types/publish"
@@ -45,7 +46,7 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 
 	// upload video
 	fileName := u2.String() + "." + "mp4"
-	err = minio.UploadFile(MinioVideoBucketName, fileName, reader, int64(len(videoData)))
+	err = minio.UploadFile(MinioVideoBucketName, fileName, reader, int64(len(videoData)), "video/mp4")
 	if err != nil {
 		// return nil, err
 		return nil, errors.New("minio.UploadFile")
@@ -57,7 +58,6 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 		// return nil, err
 		return nil, errors.New("minio.GetFileURL")
 	}
-	//playUrl := strings.Split(url.String(), "?")[0]
 
 	// get cover from video stream
 	u3, err := uuid.NewV4()
@@ -67,13 +67,13 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 
 	coverData, err := getOneFrameAsJpeg(url.String())
 	if err != nil {
-		return nil, errors.New("ffmpeg error")
+		return nil, errors.New("ffmpeg error: " + err.Error())
 	}
 
 	// upload cover
 	coverPath := u3.String() + "." + "jpeg"
 	coverReader := bytes.NewReader(coverData)
-	err = minio.UploadFile(MinioVideoBucketName, coverPath, coverReader, int64(len(coverData)))
+	err = minio.UploadFile(MinioVideoBucketName, coverPath, coverReader, int64(len(coverData)), "image/jpeg")
 	if err != nil {
 		return nil, err
 	}
@@ -84,18 +84,7 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 		return nil, err
 	}
 
-	// coverUrl := strings.Split(coverURL.String(), "?")[0]
-
-	// store in database
-	videoModel := dal.Video{
-		AuthorID: uint(in.Uid),
-		PlayURL: url.String(),
-		CoverURL: coverURL.String(),
-		FavoriteCount: 0,
-		CommentCount: 0,
-		Title: in.Title,
-	}
-	err = PublishDB.CreateVideo(l.ctx, &videoModel)
+	err = pack.CreateVideo(uint(in.Uid), url.String(), coverURL.String(), in.Title)
 	if err != nil {
 		return nil, err
 	}
@@ -111,14 +100,14 @@ func getOneFrameAsJpeg(playUrl string) ([]byte, error) {
 	log.Println(playUrl)
 	err := ffmpeg.Input(playUrl).Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", 1)}).
 		   		  Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
-				  WithOutput(reader).Run()
+				  WithOutput(reader, os.Stdout).Run()
 	if err != nil {
-		return nil, err
+		return nil, errors.New("ffmpeg failed: " + err.Error())
 	}
 
 	img, _, err := image.Decode(reader)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("image decode failed")
 	}
 
 	buf := new(bytes.Buffer)

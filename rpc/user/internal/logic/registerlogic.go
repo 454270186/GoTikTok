@@ -4,7 +4,6 @@ import (
 	"context"
 	"strconv"
 
-	"github.com/454270186/GoTikTok/dal"
 	"github.com/454270186/GoTikTok/dal/pack"
 	"github.com/454270186/GoTikTok/pkg/auth"
 	"github.com/454270186/GoTikTok/rpc/user/internal/svc"
@@ -12,8 +11,6 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
-
-var UserDB dal.UserDB
 
 type RegisterLogic struct {
 	ctx    context.Context

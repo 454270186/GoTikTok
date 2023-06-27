@@ -4,9 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/454270186/GoTikTok/dal"
 	"github.com/454270186/GoTikTok/rpc/feed/internal/config"
-	"github.com/454270186/GoTikTok/rpc/feed/internal/logic"
 	"github.com/454270186/GoTikTok/rpc/feed/internal/server"
 	"github.com/454270186/GoTikTok/rpc/feed/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/feed/types/feed"
@@ -22,9 +20,6 @@ var configFile = flag.String("f", "etc/feed.yaml", "the config file")
 
 func main() {
 	flag.Parse()
-
-	logic.FeedDB = dal.NewFeedDB()
-	logic.UserDB = dal.NewUserDB()
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)

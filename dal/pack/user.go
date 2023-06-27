@@ -1,7 +1,6 @@
 package pack
 
 import (
-	"context"
 	"errors"
 
 	"github.com/454270186/GoTikTok/dal"
@@ -10,11 +9,6 @@ import (
 )
 
 var userDB dal.UserDB
-var ctx = context.Background()
-
-func init() {
-	userDB = dal.NewUserDB()
-}
 
 func IsUserExist(username string) (uint, bool, error) {
 	userID, isExist, err := userDB.IsUserExist(ctx, username)

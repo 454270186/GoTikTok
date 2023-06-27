@@ -4,9 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/454270186/GoTikTok/dal"
 	"github.com/454270186/GoTikTok/rpc/user/internal/config"
-	"github.com/454270186/GoTikTok/rpc/user/internal/logic"
 	"github.com/454270186/GoTikTok/rpc/user/internal/server"
 	"github.com/454270186/GoTikTok/rpc/user/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
@@ -22,9 +20,6 @@ var configFile = flag.String("f", "etc/user.yaml", "the config file")
 
 func main() {
 	flag.Parse()
-
-	// init DB conn
-	logic.UserDB = dal.NewUserDB()
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)

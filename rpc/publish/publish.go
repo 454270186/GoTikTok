@@ -4,9 +4,7 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/454270186/GoTikTok/dal"
 	"github.com/454270186/GoTikTok/rpc/publish/internal/config"
-	"github.com/454270186/GoTikTok/rpc/publish/internal/logic"
 	"github.com/454270186/GoTikTok/rpc/publish/internal/server"
 	"github.com/454270186/GoTikTok/rpc/publish/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/publish/types/publish"
@@ -22,10 +20,6 @@ var configFile = flag.String("f", "etc/publish.yaml", "the config file")
 
 func main() {
 	flag.Parse()
-
-	// init DB
-	logic.PublishDB = dal.NewPublishDB()
-	logic.UserDB = dal.NewUserDB()
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
