@@ -43,6 +43,6 @@ message FavoriteActionRes {
 }
 
 service Favorite {
-    rpc FavoriteList(FavoriteListReq) returns (FavoriteListReq);
+    rpc FavoriteList(FavoriteListReq) returns (FavoriteListRes);
     rpc FavoriteAction(FavoriteActionReq) returns (FavoriteActionRes);
 }

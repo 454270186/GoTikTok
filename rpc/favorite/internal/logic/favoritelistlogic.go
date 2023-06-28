@@ -23,8 +23,8 @@ func NewFavoriteListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Favo
 	}
 }
 
-func (l *FavoriteListLogic) FavoriteList(in *favorite.FavoriteListReq) (*favorite.FavoriteListReq, error) {
+func (l *FavoriteListLogic) FavoriteList(in *favorite.FavoriteListReq) (*favorite.FavoriteListRes, error) {
 	// todo: add your logic here and delete this line
 
-	return &favorite.FavoriteListReq{}, nil
+	return &favorite.FavoriteListRes{}, nil
 }

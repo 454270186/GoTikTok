@@ -22,7 +22,7 @@ func NewFavoriteServer(svcCtx *svc.ServiceContext) *FavoriteServer {
 	}
 }
 
-func (s *FavoriteServer) FavoriteList(ctx context.Context, in *favorite.FavoriteListReq) (*favorite.FavoriteListReq, error) {
+func (s *FavoriteServer) FavoriteList(ctx context.Context, in *favorite.FavoriteListReq) (*favorite.FavoriteListRes, error) {
 	l := logic.NewFavoriteListLogic(ctx, s.svcCtx)
 	return l.FavoriteList(in)
 }

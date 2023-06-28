@@ -27,7 +27,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type FavoriteClient interface {
-	FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListReq, error)
+	FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListRes, error)
 	FavoriteAction(ctx context.Context, in *FavoriteActionReq, opts ...grpc.CallOption) (*FavoriteActionRes, error)
 }
 
@@ -39,8 +39,8 @@ func NewFavoriteClient(cc grpc.ClientConnInterface) FavoriteClient {
 	return &favoriteClient{cc}
 }
 
-func (c *favoriteClient) FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListReq, error) {
-	out := new(FavoriteListReq)
+func (c *favoriteClient) FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListRes, error) {
+	out := new(FavoriteListRes)
 	err := c.cc.Invoke(ctx, Favorite_FavoriteList_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -61,7 +61,7 @@ func (c *favoriteClient) FavoriteAction(ctx context.Context, in *FavoriteActionR
 // All implementations must embed UnimplementedFavoriteServer
 // for forward compatibility
 type FavoriteServer interface {
-	FavoriteList(context.Context, *FavoriteListReq) (*FavoriteListReq, error)
+	FavoriteList(context.Context, *FavoriteListReq) (*FavoriteListRes, error)
 	FavoriteAction(context.Context, *FavoriteActionReq) (*FavoriteActionRes, error)
 	mustEmbedUnimplementedFavoriteServer()
 }
@@ -70,7 +70,7 @@ type FavoriteServer interface {
 type UnimplementedFavoriteServer struct {
 }
 
-func (UnimplementedFavoriteServer) FavoriteList(context.Context, *FavoriteListReq) (*FavoriteListReq, error) {
+func (UnimplementedFavoriteServer) FavoriteList(context.Context, *FavoriteListReq) (*FavoriteListRes, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FavoriteList not implemented")
 }
 func (UnimplementedFavoriteServer) FavoriteAction(context.Context, *FavoriteActionReq) (*FavoriteActionRes, error) {

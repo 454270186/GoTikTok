@@ -21,7 +21,7 @@ type (
 	Video             = favorite.Video
 
 	Favorite interface {
-		FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListReq, error)
+		FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListRes, error)
 		FavoriteAction(ctx context.Context, in *FavoriteActionReq, opts ...grpc.CallOption) (*FavoriteActionRes, error)
 	}
 
@@ -36,7 +36,7 @@ func NewFavorite(cli zrpc.Client) Favorite {
 	}
 }
 
-func (m *defaultFavorite) FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListReq, error) {
+func (m *defaultFavorite) FavoriteList(ctx context.Context, in *FavoriteListReq, opts ...grpc.CallOption) (*FavoriteListRes, error) {
 	client := favorite.NewFavoriteClient(m.cli.Conn())
 	return client.FavoriteList(ctx, in, opts...)
 }
