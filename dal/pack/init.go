@@ -13,4 +13,5 @@ func init() {
 	userDB = dal.NewUserDB()
 	publishDB = dal.NewPublishDB()
 	feedDB = dal.NewFeedDB()
+	favoriteDB = dal.NewFavoriteDB()
 }

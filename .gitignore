@@ -3,3 +3,6 @@ data
 
 # log
 log
+
+# mac temp file
+.DS_Store
