@@ -2,7 +2,10 @@ package logic
 
 import (
 	"context"
+	"errors"
+	"strconv"
 
+	"github.com/454270186/GoTikTok/dal/pack"
 	"github.com/454270186/GoTikTok/rpc/favorite/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/favorite/types/favorite"
 
@@ -24,7 +27,18 @@ func NewFavoriteListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Favo
 }
 
 func (l *FavoriteListLogic) FavoriteList(in *favorite.FavoriteListReq) (*favorite.FavoriteListRes, error) {
-	// todo: add your logic here and delete this line
+	userID, err := strconv.ParseUint(in.UserId, 10, 64)
+	if err != nil {
+		return nil, errors.New("userID parse failed")
+	}
+	
+	videos, err := pack.GetFavVideosByUserID(uint(userID))
+	if err != nil {
+		return nil, err
+	}
 
-	return &favorite.FavoriteListRes{}, nil
+	return &favorite.FavoriteListRes{
+		StatusCode: 0,
+		VideoList: videos,
+	}, nil
 }
