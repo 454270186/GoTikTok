@@ -55,3 +55,21 @@ func (f FavoriteDB) GetVideoByID(ctx context.Context, videoIDs ...uint) ([]*Vide
 
 	return videos, nil
 }
+
+func (f FavoriteDB) AddFavorite(ctx context.Context, userID uint, videoID uint) error {
+	newFavorite := Favorite{
+		UserID: userID,
+		VideoID: videoID,
+	}
+
+	return f.DB.WithContext(ctx).Create(&newFavorite).Error
+}
+
+func (f FavoriteDB) DelFavorite(ctx context.Context, userID uint, videoID uint) error {
+	delFavorite := Favorite{
+		UserID: userID,
+		VideoID: videoID,
+	}
+
+	return f.DB.WithContext(ctx).Delete(&delFavorite).Error
+}

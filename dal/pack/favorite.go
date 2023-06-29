@@ -2,6 +2,7 @@ package pack
 
 import (
 	"errors"
+	"strconv"
 
 	"github.com/454270186/GoTikTok/dal"
 	"github.com/454270186/GoTikTok/rpc/favorite/types/favorite"
@@ -70,4 +71,32 @@ func convertFavUser(dalUser *dal.User) *favorite.User {
 		FollowerCount: dalUser.FollowerCount,
 		IsFollow:      true,
 	}
+}
+
+func LikeVideo(userIDstr, videoIDstr string) error {
+	userID, err := strconv.ParseUint(userIDstr, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	videoID, err := strconv.ParseUint(videoIDstr, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	return favoriteDB.AddFavorite(ctx, uint(userID), uint(videoID))
+}
+
+func UnlikeVideo(userIDstr, videoIDstr string) error {
+	userID, err := strconv.ParseUint(userIDstr, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	videoID, err := strconv.ParseUint(videoIDstr, 10, 64)
+	if err != nil {
+		return err
+	}
+
+	return favoriteDB.DelFavorite(ctx, uint(userID), uint(videoID))
 }
