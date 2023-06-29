@@ -2,6 +2,7 @@ package pack
 
 import (
 	"errors"
+	"log"
 	"strconv"
 
 	"github.com/454270186/GoTikTok/dal"
@@ -99,4 +100,14 @@ func UnlikeVideo(userIDstr, videoIDstr string) error {
 	}
 
 	return favoriteDB.DelFavorite(ctx, uint(userID), uint(videoID))
+}
+
+func IsVideoLiked(userID, videoID uint) bool {
+	isLiked, err := favoriteDB.IsExist(ctx, userID, videoID)
+	if err != nil {
+		log.Println(err)
+		return false
+	}
+
+	return isLiked
 }

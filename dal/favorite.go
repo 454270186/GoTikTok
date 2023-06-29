@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (f Favorite) GetTableName() string {
+func (Favorite) TableName() string {
 	return "users_favorite_videos"
 }
 
@@ -72,4 +72,22 @@ func (f FavoriteDB) DelFavorite(ctx context.Context, userID uint, videoID uint) 
 	}
 
 	return f.DB.WithContext(ctx).Delete(&delFavorite).Error
+}
+
+func (f FavoriteDB) IsExist(ctx context.Context, userID uint, videoID uint) (bool, error) {
+	findFavorite := Favorite{
+		UserID: userID,
+		VideoID: videoID,
+	}
+
+	err := f.DB.WithContext(ctx).First(&findFavorite).Error
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return false, nil
+		}
+
+		return false, err
+	}
+
+	return true, nil
 }
