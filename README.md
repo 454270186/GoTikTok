@@ -4,6 +4,9 @@
 - Gin
 - Go-Zero
 - gRPC
+- Gorm
+- Go-JWT
+- Minio
+- Nginx
 - Mysql
 - Docker
-- Viper
