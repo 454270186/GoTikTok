@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 
+	"github.com/454270186/GoTikTok/dal/pack"
 	"github.com/454270186/GoTikTok/rpc/favorite/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/favorite/types/favorite"
 
@@ -24,7 +25,23 @@ func NewFavoriteActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Fa
 }
 
 func (l *FavoriteActionLogic) FavoriteAction(in *favorite.FavoriteActionReq) (*favorite.FavoriteActionRes, error) {
-	// todo: add your logic here and delete this line
+	switch in.ActionType {
+	case "1":
+		// like
+		err := pack.LikeVideo(in.UserId, in.VideoId)
+		if err != nil {
+			return nil, err
+		}
 
-	return &favorite.FavoriteActionRes{}, nil
+	case "2":
+		// unlike
+		err := pack.UnlikeVideo(in.UserId, in.VideoId)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &favorite.FavoriteActionRes{
+		StatusCode: 0,
+	}, nil
 }
