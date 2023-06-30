@@ -7,8 +7,14 @@ import (
 	"gorm.io/gorm"
 )
 
+var DB *gorm.DB
+
 func newDB() *gorm.DB {
-	DB := initDB()
+	if DB != nil {
+		return DB
+	}
+
+	DB = initDB()
 
 	if DB == nil {
 		log.Fatal("BD is nil")

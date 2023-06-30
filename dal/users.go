@@ -6,6 +6,10 @@ import (
 	"gorm.io/gorm"
 )
 
+func (User) TableName() string {
+	return "users"
+}
+
 type UserDB struct {
 	DB *gorm.DB
 }

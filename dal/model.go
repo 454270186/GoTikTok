@@ -28,3 +28,12 @@ type Favorite struct {
 	UserID  uint `gorm:"primaryKey;column:user_id"`
 	VideoID uint `gorm:"primaryKey;column:video_id"`
 }
+
+type Comments struct {
+	ID        uint   `gorm:"primarykey"`
+	UserID    uint   `gorm:"column:user_id"`
+	VideoID   uint   `gorm:"column:video_id"`
+	Content   string `gorm:"column:content"`
+	CreatedAt time.Time
+	UpdatedAt time.Time
+}

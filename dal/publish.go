@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm"
 )
 
-func (v Video) GetTableName() string {
+func (Video) TableName() string {
 	return "videos"
 }
 
