@@ -4,29 +4,32 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-type DefaultRes struct {
-	StatusCode int    `json:"status_code"`
-	StatusMsg  string `json:"status_msg"`
-	Option map[string]interface{} `json:"omitempty"`
-}
-
 func SendResponse(c *gin.Context, msg string, options ...map[string]interface{}) {
-	if len(options) == 0 {
-		c.JSON(200, DefaultRes{StatusCode: 0, StatusMsg: msg})
-		return
+	response := make(map[string]any)
+	response["status_code"] = 0
+	response["status_msg"] = msg
+
+	if len(options) > 0 {
+		for k, v := range options[0] {
+			response[k] = v
+		}
 	}
-	
-	c.JSON(200, DefaultRes{
-		StatusCode: 0,
-		StatusMsg: msg,
-		Option: options[0],
-	})
+
+	c.JSON(200, response)
 }
 
 func SendError(c *gin.Context, errMsg string) {
-	c.JSON(400, DefaultRes{StatusCode: -1, StatusMsg: errMsg})
+	response := make(map[string]any)
+	response["status_code"] = -1
+	response["status_msg"] = errMsg
+
+	c.JSON(400, response)
 }
 
 func SendRpcError(c *gin.Context, errMsg string) {
-	c.JSON(500, DefaultRes{StatusCode: -1, StatusMsg: errMsg})
+	response := make(map[string]any)
+	response["status_code"] = -2
+	response["status_msg"] = errMsg
+
+	c.JSON(500, response)
 }

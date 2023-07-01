@@ -1,10 +1,9 @@
 package handler
 
 import (
-	// "log"
 	"net/http"
 
-	// "github.com/454270186/GoTikTok/cmd/model"
+	"github.com/454270186/GoTikTok/cmd/httpres"
 	"github.com/454270186/GoTikTok/cmd/rpccli"
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
 	"github.com/454270186/GoTikTok/rpc/user/userservice"
@@ -27,10 +26,7 @@ func (u UserHandler) Register(c *gin.Context) {
 	password := c.Query("password")
 
 	if len(username) == 0 || len(password) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": "username and password cannot be empty",
-		})
+		httpres.SendError(c, "username and password cannot be empty")
 		return
 	}
 
@@ -41,10 +37,7 @@ func (u UserHandler) Register(c *gin.Context) {
 
 	resp, err := u.userRpcCli.Register(c.Copy(), &in)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendRpcError(c, err.Error())
 		return
 	} else if resp.StatusCode != 0 {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -54,9 +47,7 @@ func (u UserHandler) Register(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"status_code": 0,
-		"status_msg": "register successfully",
+	httpres.SendResponse(c, "register successfully", gin.H{
 		"user_id": resp.UserId,
 		"token": resp.Token,
 	})
@@ -67,10 +58,7 @@ func (u UserHandler) Login(c *gin.Context) {
 	password := c.Query("password")
 
 	if len(username) == 0 || len(password) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": "username and password cannot be empty",
-		})
+		httpres.SendError(c, "username and password cannot be empty")
 		return
 	}
 
@@ -81,10 +69,7 @@ func (u UserHandler) Login(c *gin.Context) {
 
 	resp, err := u.userRpcCli.Login(c.Copy(), &in)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendRpcError(c, err.Error())
 		return
 	} else if resp.StatusCode != 0 {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -94,9 +79,7 @@ func (u UserHandler) Login(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"status_code": 0,
-		"status_msg": "login successfully",
+	httpres.SendResponse(c, "login successfully", gin.H{
 		"user_id": resp.UserId,
 		"token": resp.Token,
 	})
@@ -105,10 +88,7 @@ func (u UserHandler) Login(c *gin.Context) {
 func (u UserHandler) GetUser(c *gin.Context) {
 	userId := c.Query("user_id")
 	if len(userId) == 0 {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": "userID cannot be empty",
-		})
+		httpres.SendError(c, "userID cannot be empty")
 		return
 	}
 
@@ -118,10 +98,7 @@ func (u UserHandler) GetUser(c *gin.Context) {
 
 	resp, err := u.userRpcCli.GetUserById(c.Copy(), &in)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendRpcError(c, err.Error())
 		return
 	} else if resp.StatusCode != 0 {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -131,9 +108,7 @@ func (u UserHandler) GetUser(c *gin.Context) {
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"status_code": 0,
-		"status_msg": "success",
+	httpres.SendResponse(c, "success", gin.H{
 		"user": gin.H{
 			"id": resp.User.Id,
 			"name": resp.User.Name,
@@ -141,5 +116,5 @@ func (u UserHandler) GetUser(c *gin.Context) {
 			"follower_count": resp.User.FollowerCount,
 			"isfollow": true,
 		},
-	})	
+	})
 }

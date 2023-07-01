@@ -1,9 +1,9 @@
 package handler
 
 import (
-	"net/http"
 	"strconv"
 
+	"github.com/454270186/GoTikTok/cmd/httpres"
 	"github.com/454270186/GoTikTok/cmd/rpccli"
 	"github.com/454270186/GoTikTok/rpc/feed/feedservice"
 	"github.com/454270186/GoTikTok/rpc/feed/types/feed"
@@ -28,10 +28,7 @@ func (f FeedHandler) GetUserFeed(c *gin.Context) {
 		var err error
 		latestTime, err = strconv.ParseInt(latest, 10, 64)
 		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{
-				"status_code": -1,
-				"status_msg": err.Error(),
-			})
+			httpres.SendError(c, err.Error())
 			return
 		}
 	}
@@ -42,16 +39,11 @@ func (f FeedHandler) GetUserFeed(c *gin.Context) {
 
 	resp, err := f.feedCli.GetUserFeed(c.Copy(), &in)
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendRpcError(c, err.Error())
 		return
 	}
 
-	c.JSON(200, gin.H{
-		"status_code": 0,
-		"status_msg": "success",
+	httpres.SendResponse(c, "success", gin.H{
 		"next_time": resp.NextTime,
 		"video_list": resp.VideoList,
 	})

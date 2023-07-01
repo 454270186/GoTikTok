@@ -4,9 +4,9 @@ import (
 	"bytes"
 	"context"
 	"io"
-	"log"
 	"net/http"
 
+	"github.com/454270186/GoTikTok/cmd/httpres"
 	"github.com/454270186/GoTikTok/cmd/rpccli"
 	"github.com/454270186/GoTikTok/pkg/auth"
 	"github.com/454270186/GoTikTok/rpc/publish/publishclient"
@@ -32,10 +32,7 @@ func (p PublishHandler) List(c *gin.Context) {
 
 	resp, err := p.pubRpcCli.PublishList(context.Background(), &in)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendRpcError(c, err.Error())
 		return
 	} else if resp.StatusCode != 0 {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -45,11 +42,7 @@ func (p PublishHandler) List(c *gin.Context) {
 		return
 	}
 
-	log.Println(resp)
-
-	c.JSON(200, gin.H{
-		"status_code": 0,
-		"status_msg": "success",
+	httpres.SendResponse(c, "success", gin.H{
 		"video_list": resp.VideoList,
 	})
 }
@@ -59,45 +52,27 @@ func (p PublishHandler) Action(c *gin.Context) {
 	tokenStr := c.PostForm("token")
 	fileHeader, err := c.FormFile("data")
 	if err != nil {
-		log.Println(err, "1111")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendError(c, err.Error())
 		return
 	}
 
-	log.Println(title, tokenStr)
-
 	file, err := fileHeader.Open()
 	if err != nil {
-		log.Println(err, "2222")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendError(c, err.Error())
 		return
 	}
 	defer file.Close()
 
 	buf := bytes.NewBuffer(nil)
 	if _, err := io.Copy(buf, file); err != nil {
-		log.Println(err, "3333")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendError(c, err.Error())
 		return
 	}
 
 	// get user id from token
 	uid, err := auth.GetUIDFromToken(tokenStr)
 	if err != nil {
-		log.Println(err, "4444")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendError(c, err.Error())
 		return
 	}
 
@@ -107,15 +82,11 @@ func (p PublishHandler) Action(c *gin.Context) {
 		Uid: int64(uid),
 	}
 	
-	resp, err := p.pubRpcCli.PublishAction(c.Copy(), &in)
+	_, err = p.pubRpcCli.PublishAction(c.Copy(), &in)
 	if err != nil {
-		log.Println(err, "5555")
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status_code": -1,
-			"status_msg": err.Error(),
-		})
+		httpres.SendRpcError(c, err.Error())
 		return
 	}
 
-	c.JSON(200, resp)
+	httpres.SendResponse(c, "publish successfully")
 }
