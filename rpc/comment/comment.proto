@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package comment;
+
+option go_package = "./comment";
+
+message User {
+    int64 id = 1;
+    string name = 2;
+    int64 follow_count = 3;
+    int64 follower_count = 4;
+    bool is_follow = 5;
+}
+
+message Comment {
+    int64 id = 1;
+    User user = 2;
+    string content = 3;
+    string createDate = 4;
+}
+
+message CommentListReq {
+    string videoId = 1;
+}
+
+message CommentListRes {
+    int32 statusCode = 1;
+    repeated Comment commentList = 2;
+}
+
+message AddCommentReq {
+    string videoId = 1;
+    string userId = 2;
+    string commentText = 3;
+}
+
+message AddCommentRes {
+    int32 statusCode = 1;
+    Comment comment = 2;
+}
+
+message DelCommentReq {
+    string commentId = 3;
+}
+
+message DelCommentRes {
+    int32 statusCode = 1;
+}
+
+service Comments {
+    rpc CommentList(CommentListReq) returns (CommentListRes);
+    rpc AddComment(AddCommentReq) returns (AddCommentRes);
+    rpc DelComment(DelCommentReq) returns (DelCommentRes);
+}
