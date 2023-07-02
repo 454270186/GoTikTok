@@ -14,4 +14,5 @@ func init() {
 	publishDB = dal.NewPublishDB()
 	feedDB = dal.NewFeedDB()
 	favoriteDB = dal.NewFavoriteDB()
+	commentDB = dal.NewCommentDB()
 }
