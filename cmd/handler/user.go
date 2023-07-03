@@ -115,6 +115,9 @@ func (u UserHandler) GetUser(c *gin.Context) {
 			"follow_count": resp.User.FollowCount,
 			"follower_count": resp.User.FollowerCount,
 			"isfollow": true,
+			"avatar": "https://cdn.pixabay.com/photo/2023/06/26/04/35/ai-generated-8088678_1280.jpg",
+			"background_image": "https://cdn.pixabay.com/photo/2012/08/27/14/19/mountains-55067_1280.png",
+			"signature": "true 2 myself",
 		},
 	})
 }
