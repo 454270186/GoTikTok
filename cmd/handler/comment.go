@@ -1,8 +1,12 @@
 package handler
 
 import (
+	"log"
+	"strconv"
+
 	"github.com/454270186/GoTikTok/cmd/httpres"
 	"github.com/454270186/GoTikTok/cmd/rpccli"
+	"github.com/454270186/GoTikTok/pkg/auth"
 	"github.com/454270186/GoTikTok/rpc/comment/comments"
 	"github.com/gin-gonic/gin"
 )
@@ -40,6 +44,12 @@ func (com CommentHandler) List(c *gin.Context) {
 }
 
 func (com CommentHandler) Action(c *gin.Context) {
+	userID, err := auth.GetUIDFromToken(c.Query("token"))
+	if err != nil {
+		httpres.SendError(c, err.Error())
+		return
+	}
+
 	videoID := c.Query("video_id")
 	actionType := c.Query("action_type")
 	if len(videoID) == 0 || len(actionType) == 0 {
@@ -55,10 +65,12 @@ func (com CommentHandler) Action(c *gin.Context) {
 		in := comments.AddCommentReq{
 			VideoId: videoID,
 			CommentText: text,
+			UserId: strconv.Itoa(int(userID)),
 		}
 
 		resp, err := com.commentRpcCli.AddComment(c.Copy(), &in)
 		if err != nil {
+			log.Println(err)
 			httpres.SendRpcError(c, err.Error())
 			return
 		}
@@ -72,7 +84,6 @@ func (com CommentHandler) Action(c *gin.Context) {
 		commentID := c.Query("comment_id")
 
 		in := comments.DelCommentReq{
-			VideoId: videoID,
 			CommentId: commentID,
 		}
 
