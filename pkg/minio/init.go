@@ -8,9 +8,10 @@ import (
 )
 
 var (
-	minioClient          *minio.Client
+	minioClient *minio.Client
 	// MinioEndpoint        = "172.20.10.2:9000"
-	MinioEndpoint        = "192.168.2.44:9000"
+	// MinioEndpoint        = "192.168.2.44:9000"
+	MinioEndpoint        = "10.14.13.212:9000"
 	MinioAccessKeyId     = "tiktokMinio"
 	MinioSecretAccessKey = "tiktokMinio"
 	MinioUseSSL          = false

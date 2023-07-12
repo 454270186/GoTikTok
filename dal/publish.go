@@ -37,6 +37,15 @@ func (p PublishDB) GetListByID(ctx context.Context, userID uint) ([]*Video, erro
 	return videoList, nil
 }
 
-func (p PublishDB) CreateVideo(ctx context.Context, video *Video) error {
-	return p.DB.WithContext(ctx).Create(video).Error
+func (p PublishDB) CreateVideo(ctx context.Context, video *Video) (uint, error) {
+	err := p.DB.WithContext(ctx).Create(video).Error
+	if err != nil {
+		return 0, err
+	}
+
+	return video.ID, nil
+}
+
+func (p PublishDB) DelByID(ctx context.Context, videoID uint) error {
+	return p.DB.WithContext(ctx).Delete(&Video{ID: videoID}).Error
 }

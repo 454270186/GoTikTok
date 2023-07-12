@@ -1,14 +1,20 @@
 package minio
 
 import (
+	"bytes"
 	"context"
 	"errors"
+	"fmt"
+	"image"
+	"image/jpeg"
 	"io"
 	"log"
 	"net/url"
+	"os"
 	"time"
 
 	"github.com/minio/minio-go/v7"
+	ffmpeg "github.com/u2takey/ffmpeg-go"
 )
 
 func CreateBucket(bucketName string) error {
@@ -74,4 +80,57 @@ func GetFileURL(bucketName string, fileName string, exp time.Duration) (*url.URL
 	}
 
 	return preSignedUrl, nil
+}
+
+// UploadVideo() uploads video and cover data to minio bucket
+// Encapsulates UploadFile() for video and cover
+func UploadVideo(bucketName, videoFileName, coverFileName string, videoData []byte) error {
+	videoReader := bytes.NewReader(videoData)
+	
+	// upload video data
+	err := UploadFile(bucketName, videoFileName, videoReader, int64(len(videoData)), "video/mp4")
+	if err != nil {
+		return errors.New("video upload failed: " + err.Error())
+	}
+
+	playUrl, err := GetFileURL(bucketName, videoFileName, 0)
+	if err != nil {
+		return err
+	}
+
+	coverData, err := getOneFrameAsJpeg(playUrl.String())
+	if err != nil {
+		return errors.New("ffmpeg error: " + err.Error())
+	}
+
+	// upload cover
+	coverReader := bytes.NewReader(coverData)
+	err = UploadFile(bucketName, coverFileName, coverReader, int64(len(coverData)), "image/jpeg")
+	if err != nil {
+		return errors.New("cover upload failed: " + err.Error())
+	}
+
+	return nil
+}
+
+// 从视频流中截取一帧作为封面
+func getOneFrameAsJpeg(playUrl string) ([]byte, error) {
+	reader := bytes.NewBuffer(nil)
+	log.Println(playUrl)
+	err := ffmpeg.Input(playUrl).Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", 1)}).
+		   		  Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
+				  WithOutput(reader, os.Stdout).Run()
+	if err != nil {
+		return nil, errors.New("ffmpeg failed: " + err.Error())
+	}
+
+	img, _, err := image.Decode(reader)
+	if err != nil {
+		return nil, errors.New("image decode failed")
+	}
+
+	buf := new(bytes.Buffer)
+	jpeg.Encode(buf, img, nil)
+
+	return buf.Bytes(), nil
 }
