@@ -116,7 +116,7 @@ func UploadVideo(bucketName, videoFileName, coverFileName string, videoData []by
 // 从视频流中截取一帧作为封面
 func getOneFrameAsJpeg(playUrl string) ([]byte, error) {
 	reader := bytes.NewBuffer(nil)
-	log.Println(playUrl)
+	
 	err := ffmpeg.Input(playUrl).Filter("select", ffmpeg.Args{fmt.Sprintf("gte(n,%d)", 1)}).
 		   		  Output("pipe:", ffmpeg.KwArgs{"vframes": 1, "format": "image2", "vcodec": "mjpeg"}).
 				  WithOutput(reader, os.Stdout).Run()
