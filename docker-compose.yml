@@ -145,3 +145,9 @@ services:
       - "5672:5672"
       - "15672:15672"
       
+  redis:
+    container_name: redis
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    command: redis-server --requirepass 2021110003
