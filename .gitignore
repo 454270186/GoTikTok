@@ -6,3 +6,6 @@ log
 
 # mac temp file
 .DS_Store
+
+# env file
+.env

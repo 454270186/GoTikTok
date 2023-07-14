@@ -1,10 +1,30 @@
 package main
 
-// test user
+import (
+	"fmt"
+
+	"github.com/joho/godotenv"
+)
+
+var (
+	host string
+	port string
+)
+
+func init() {
+	webEnv, err := godotenv.Read()
+	if err != nil {
+		panic("fail to read env: " + err.Error())
+	}
+
+	host = webEnv["BG_HOST"]
+	port = webEnv["PORT"]
+}
+
 func main() {
 	router := NewRouter()
 
-	// router.Run("172.20.10.2:8181") // 热点
-	// router.Run("192.168.2.44:8181") // 家里
-	router.Run("10.14.13.212:8181") // BG
+	ipAddr := fmt.Sprintf("%s:%s", host, port)
+
+	router.Run(ipAddr)
 }

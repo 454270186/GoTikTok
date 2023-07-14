@@ -3,23 +3,33 @@ package minio
 import (
 	"log"
 
+	"github.com/joho/godotenv"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
 
 var (
-	minioClient *minio.Client
-	// MinioEndpoint        = "172.20.10.2:9000"
-	// MinioEndpoint        = "192.168.2.44:9000"
-	MinioEndpoint        = "10.14.13.212:9000"
-	MinioAccessKeyId     = "tiktokMinio"
-	MinioSecretAccessKey = "tiktokMinio"
+	minioClient          *minio.Client
+	MinioEndpoint        string
+	MinioAccessKeyId     string
+	MinioSecretAccessKey string
 	MinioUseSSL          = false
-	VideoBucketName      = "tiktok-video"
+	VideoBucketName      string
 )
 
 // initialize minio storage object
 func init() {
+	// init minio env
+	mEnv, err := godotenv.Read()
+	if err != nil {
+		panic(err)
+	}
+	MinioEndpoint = mEnv["M_ENDPOINT"]
+	MinioAccessKeyId = mEnv["M_ACCESS_KEY_ID"]
+	MinioSecretAccessKey = mEnv["M_SECRET_ACCESS_KEY"]
+	VideoBucketName = mEnv["M_VIDEO_BUCKET_NAME"]
+
+	// connect to minio server
 	client, err := minio.New(MinioEndpoint, &minio.Options{
 		Secure: MinioUseSSL,
 		Creds:  credentials.NewStaticV4(MinioAccessKeyId, MinioSecretAccessKey, ""),
