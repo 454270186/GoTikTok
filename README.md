@@ -10,6 +10,7 @@
 - Go-JWT
 - Minio
 - Nginx
+- Redis
 - Mysql
 - Docker
 
@@ -32,6 +33,8 @@
 
 ## 优化
 1. 在Publish RPC Servic中，异步进行Minio的视频上传，若上传失败再删除db中的记录，加快对客户端的响应速度
+2. 对于可能压力较大的接口(如点赞，关注)， 使用rabiitmq异步处理，并使用redis作为缓存，定时与mysql同步
+3. 采用自旋的方式实现简单的redis分布式锁
 
 <br>
 <br>
