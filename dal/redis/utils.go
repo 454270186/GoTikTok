@@ -17,7 +17,7 @@ func PutKeyWith(ctx context.Context, key string, val any, exp time.Duration) err
 	return GetRDB().Set(ctx, key, val, exp).Err()
 }
 
-func Get(ctx context.Context, key string) (any, error) {
+func Get(ctx context.Context, key string) (string, error) {
 	return GetRDB().Get(ctx, key).Result()
 }
 
