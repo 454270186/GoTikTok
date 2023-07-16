@@ -21,7 +21,7 @@ var (
 )
 
 func init() {
-	dbEnv, err := godotenv.Read()
+	dbEnv, err := godotenv.Read("../.env")
 	if err != nil {
 		panic("fail to read db env: " + err.Error())
 	}

@@ -12,12 +12,12 @@ var (
 )
 
 func init() {
-	webEnv, err := godotenv.Read()
+	webEnv, err := godotenv.Read("../.env")
 	if err != nil {
 		panic("fail to read env: " + err.Error())
 	}
 
-	host = webEnv["BG_HOST"]
+	host = webEnv["HOST"]
 	port = webEnv["PORT"]
 }
 

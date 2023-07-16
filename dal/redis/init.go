@@ -22,7 +22,7 @@ var (
 )
 
 func init() {
-	rdbEnv, err := godotenv.Read()
+	rdbEnv, err := godotenv.Read("../.env")
 	if err != nil {
 		panic("fail to read redis env: " + err.Error())
 	}

@@ -20,7 +20,7 @@ var (
 // initialize minio storage object
 func init() {
 	// init minio env
-	mEnv, err := godotenv.Read()
+	mEnv, err := godotenv.Read("../.env")
 	if err != nil {
 		panic(err)
 	}

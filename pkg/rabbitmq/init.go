@@ -12,7 +12,7 @@ var (
 )
 
 func init() {
-	mqMap, err := godotenv.Read()
+	mqMap, err := godotenv.Read("../.env")
 	if err != nil {
 		panic(err)
 	}
