@@ -12,6 +12,7 @@
 - Nginx
 - Redis
 - Mysql
+- RabbitMQ
 - Docker
 
 ## 架构分层
@@ -22,8 +23,9 @@
 使用Go-Zero生成RPC服务端脚手架，使用ETCD进行服务注册和服务发现
 
 ### 3. DAL层
-数据库使用MySQL，并使用Gorm对数据库进行ORM操作<br>
+- 数据库使用MySQL，并使用Gorm对数据库进行ORM操作<br>
 **pack**层将查询结果包装，RPC层可直接调用
+- 使用Redis作为缓存，提供自旋锁，基本操作，定时同步等接口
 
 ### 4. pkg层
 - JWT：JWT的生成和校验
