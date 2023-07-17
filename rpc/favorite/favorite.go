@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	"github.com/454270186/GoTikTok/dal/redis"
 	"github.com/454270186/GoTikTok/rpc/favorite/internal/config"
 	"github.com/454270186/GoTikTok/rpc/favorite/internal/server"
 	"github.com/454270186/GoTikTok/rpc/favorite/internal/svc"
@@ -17,6 +18,11 @@ import (
 )
 
 var configFile = flag.String("f", "etc/favorite.yaml", "the config file")
+
+func init() {
+	// async consume rabbitmq to redis
+	go redis.Consume()
+}
 
 func main() {
 	flag.Parse()

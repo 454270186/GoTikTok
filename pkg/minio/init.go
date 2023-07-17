@@ -35,7 +35,7 @@ func init() {
 		Creds:  credentials.NewStaticV4(MinioAccessKeyId, MinioSecretAccessKey, ""),
 	})
 	if err != nil {
-		log.Fatalln("minio client init failed")
+		log.Fatalln("minio client init failed:", MinioEndpoint)
 	}
 
 	minioClient = client

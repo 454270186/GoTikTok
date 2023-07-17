@@ -8,20 +8,20 @@ import (
 	"testing"
 
 	"github.com/454270186/GoTikTok/dal/redis"
-	"github.com/454270186/GoTikTok/dal/redis/rcache"
+	"github.com/454270186/GoTikTok/dal/redis/rmodel"
 	r "github.com/redis/go-redis/v9"
 )
 
 var rdb *r.Client
 func TestRcache(t *testing.T) {
 	fmt.Println("test start")
-	favOp1 := rcache.FavoriteCache{
+	favOp1 := rmodel.FavoriteCache{
 		VideoID: 2,
 		UserID: 12,
 		ActionType: 1,
 		CreatedAt: 9,
 	}
-	favOp2 := rcache.FavoriteCache{
+	favOp2 := rmodel.FavoriteCache{
 		VideoID: 2,
 		UserID: 12,
 		ActionType: 0,
@@ -32,7 +32,7 @@ func TestRcache(t *testing.T) {
 	wg.Add(2)
 	go func ()  {
 		defer wg.Done()
-		err := rcache.UpdateVideo(context.Background(), &favOp2)
+		err := redis.UpdateVideo(context.Background(), &favOp2)
 		if err != nil {
 			log.Println("go1 error", err)
 		}
@@ -40,7 +40,7 @@ func TestRcache(t *testing.T) {
 
 	go func ()  {
 		defer wg.Done()
-		err := rcache.UpdateVideo(context.Background(), &favOp1)
+		err := redis.UpdateVideo(context.Background(), &favOp1)
 		if err != nil {
 			log.Println("go2 error", err)
 		}

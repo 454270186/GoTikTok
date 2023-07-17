@@ -5,6 +5,7 @@ import (
 	"time"
 
 	//"github.com/454270186/GoTikTok/pkg/timer"
+	"github.com/454270186/GoTikTok/pkg/timer"
 	"github.com/joho/godotenv"
 	r "github.com/redis/go-redis/v9"
 )
@@ -13,7 +14,7 @@ var (
 	RedisAddr string
 	RedisPassword string
 
-	SyncDuration = 10 * time.Second
+	SyncDuration = 5 * time.Second
 )
 
 var (
@@ -22,7 +23,7 @@ var (
 )
 
 func init() {
-	rdbEnv, err := godotenv.Read("../../.env")
+	rdbEnv, err := godotenv.Read("../.env")
 	if err != nil {
 		panic("fail to read redis env: " + err.Error())
 	}
@@ -30,7 +31,7 @@ func init() {
 	RedisAddr = rdbEnv["R_ADDR"]
 	RedisPassword = rdbEnv["R_PSW"]
 
-	//timer.SyncTimer(SyncDuration, moveFavoriteToDB)
+	timer.SyncTimer(SyncDuration, MoveFavoriteToDB)
 }
 
 // Get redis client
