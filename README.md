@@ -30,6 +30,8 @@
 - Auth：用户密码的加密和校验
 - Minio：封装Minio对象存储的接口，并使用Nginx对多台Minio服务器进行负载均衡
 - Middleware：HTTP中间件
+- RabbitMQ: 封装了RabbitMQ的操作接口
+- Timer: 简易定时器，用于redis和mysql的定时同步
 
 ## 优化
 1. 在Publish RPC Servic中，异步进行Minio的视频上传，若上传失败再删除db中的记录，加快对客户端的响应速度
