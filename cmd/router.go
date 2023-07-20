@@ -9,6 +9,9 @@ import (
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 
+	// global middleware
+	r.Use(middleware.Cors())
+
 	userHandler := handler.NewUserHandler()
 	publishHandler := handler.NewPubHandler()
 	feefHandler := handler.NewFeedHandler()
