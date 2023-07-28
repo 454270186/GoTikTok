@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS users (
-    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     username varchar(40) NOT NULL,
     password varchar(256) NOT NULL,
     following_count BIGINT NOT NULL DEFAULT 0,
@@ -11,8 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
 CREATE TABLE IF NOT EXISTS videos (
     ID BIGINT PRIMARY KEY AUTO_INCREMENT,
     author_id BIGINT UNSIGNED NOT NULL,
-    play_url varchar(256) NOT NULL,
-    cover_url varchar(256) NOT NULL,
+    video_name varchar(256) NOT NULL,
+    cover_name varchar(256) NOT NULL,
     favorite_count BIGINT NOT NULL DEFAULT 0,
     comment_count BIGINT NOT NULL DEFAULT 0,
     title varchar(50) NOT NULL,
