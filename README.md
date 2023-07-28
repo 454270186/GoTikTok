@@ -3,6 +3,7 @@
 ![Mysql](https://img.shields.io/badge/MySQL-4479A1.svg?style=for-the-badge&logo=MySQL&logoColor=white)
 ![RabbitMQ](https://img.shields.io/badge/RabbitMQ-FF6600.svg?style=for-the-badge&logo=RabbitMQ&logoColor=white)
 ![Docker](https://img.shields.io/badge/Docker-2496ED.svg?style=for-the-badge&logo=Docker&logoColor=white)
+![OpenTelemetry](https://img.shields.io/badge/OpenTelemetry-000000.svg?style=for-the-badge&logo=OpenTelemetry&logoColor=white)
 ![Nginx](https://img.shields.io/badge/NGINX-009639.svg?style=for-the-badge&logo=NGINX&logoColor=white)
 # GoTikTok
 
@@ -19,6 +20,7 @@
 - Redis
 - Mysql
 - RabbitMQ
+- Jaeger
 - Docker
 
 ## 架构分层
@@ -40,6 +42,7 @@
 - Middleware：HTTP中间件
 - RabbitMQ: 封装了RabbitMQ的操作接口
 - Timer: 简易定时器，用于redis和mysql的定时同步
+- Tracer: 封装Jaeger接口，基于OpenTelemetry对服务进行链路追踪
 
 ## 优化
 1. 在Publish RPC Servic中，异步进行Minio的视频上传，若上传失败再删除db中的记录，加快对客户端的响应速度
