@@ -38,3 +38,25 @@ func InitTracer(serviceName, agentHostPort string) error {
 	Tracer, Closer = t, c
 	return nil
 }
+
+func getParentSpan(operationName, traceID string, isRoot bool) (opentracing.Span, error) {
+	// TODO
+	return nil, nil
+}
+
+func StartSpan(operationName, parentTracID string, isRoot bool) (opentracing.Span, string, error) {
+	// TODO
+	return nil, "", nil
+}
+
+func FinishSpan(span opentracing.Span) {
+	if span != nil {
+		span.Finish()
+	}
+}
+
+func SpanSetTag(span opentracing.Span, tagKey, tagValue string) {
+	if span != nil {
+		span.SetTag(tagKey, tagValue)
+	}
+}
