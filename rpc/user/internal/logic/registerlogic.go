@@ -6,6 +6,7 @@ import (
 
 	"github.com/454270186/GoTikTok/dal/pack"
 	"github.com/454270186/GoTikTok/pkg/auth"
+	"github.com/454270186/GoTikTok/pkg/tracing"
 	"github.com/454270186/GoTikTok/rpc/user/internal/svc"
 	"github.com/454270186/GoTikTok/rpc/user/types/user"
 
@@ -18,6 +19,12 @@ type RegisterLogic struct {
 	logx.Logger
 }
 
+var userRPCTracer tracing.JaegerTracer
+
+func init() {
+	userRPCTracer = tracing.NewTracer("User-RPC-Service", "127.0.0.1:6831")
+}
+
 func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RegisterLogic {
 	return &RegisterLogic{
 		ctx:    ctx,
@@ -27,13 +34,19 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error) {
+	span, traceID, _ := userRPCTracer.StartSpan("RPC_Register", in.TraceID, false)
+	defer userRPCTracer.FinishSpan(span)
+
 	// encoded user's password
 	encrypted, _ := auth.GetHashedPwd(in.Password)
 
+	mysqlSpan, _, _ := userRPCTracer.StartSpan("DB: Create new user", traceID, false)
 	newUserID, err := pack.CreateNewUser(in.Username, string(encrypted))
 	if err != nil {
+		userRPCTracer.FinishSpan(mysqlSpan)
 		return nil, err
 	}
+	userRPCTracer.FinishSpan(mysqlSpan)
 
 	token, _ := auth.NewTokenByUserID(newUserID)
 	if token == "" {
