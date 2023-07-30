@@ -9,17 +9,13 @@ import (
 	jaegerConfig "github.com/uber/jaeger-client-go/config"
 )
 
-var (
+type JaegerTracer struct {
 	Tracer opentracing.Tracer
 	Closer io.Closer
-)
+}
 
-// Init a Jaeger tracer
-func InitTracer(serviceName, agentHostPort string) error {
-	if Tracer != nil && Closer != nil {
-		return nil
-	}
-
+// Return a new Jaeger Tracer
+func NewTracer(serviceName, agentHostPort string) JaegerTracer {
 	cfg := jaegerConfig.Configuration{
 		ServiceName: serviceName,
 		Reporter: &jaegerConfig.ReporterConfig{
@@ -37,38 +33,40 @@ func InitTracer(serviceName, agentHostPort string) error {
 		panic("error while initial a Tracer")
 	}
 
-	Tracer, Closer = t, c
-	return nil
+	return JaegerTracer{
+		Tracer: t,
+		Closer: c,
+	}
 }
 
 // Return parent span(or a new span if no parent) and error
-func getParentSpan(operationName, traceID string, isRoot bool) (opentracing.Span, error) {
-	if Tracer == nil {
+func (j *JaegerTracer) getParentSpan(operationName, traceID string, isRoot bool) (opentracing.Span, error) {
+	if j.Tracer == nil {
 		log.Println("Tracer is nil")
 		return nil, errors.New("tracer is nil")
 	}
 
-	parentSpanCtx, err := Tracer.Extract(opentracing.TextMap, opentracing.TextMapCarrier{"UBER-TRACE-ID": traceID})
+	parentSpanCtx, err := j.Tracer.Extract(opentracing.TextMap, opentracing.TextMapCarrier{"UBER-TRACE-ID": traceID})
 	if err != nil {
 		if isRoot {
-			return Tracer.StartSpan(operationName), nil
+			return j.Tracer.StartSpan(operationName), nil
 		}
 		log.Println("error while extract: ", err)
 		return nil, err
 	}
 
-	return Tracer.StartSpan(operationName, opentracing.ChildOf(parentSpanCtx)), nil
+	return j.Tracer.StartSpan(operationName, opentracing.ChildOf(parentSpanCtx)), nil
 }
 
-func StartSpan(operationName, parentTracID string, isRoot bool) (opentracing.Span, string, error) {
-	parentSpan, err := getParentSpan(operationName, parentTracID, isRoot)
+func (j *JaegerTracer) StartSpan(operationName, parentTracID string, isRoot bool) (opentracing.Span, string, error) {
+	parentSpan, err := j.getParentSpan(operationName, parentTracID, isRoot)
 	if err != nil {
 		log.Println("no span return: ", err)
 		return nil, "", errors.New("error while get parent span")
 	}
 
 	carrier := opentracing.TextMapCarrier{}
-	err = Tracer.Inject(parentSpan.Context(), opentracing.TextMap, carrier)
+	err = j.Tracer.Inject(parentSpan.Context(), opentracing.TextMap, carrier)
 	if err != nil {
 		return nil, "", err
 	}
@@ -77,13 +75,13 @@ func StartSpan(operationName, parentTracID string, isRoot bool) (opentracing.Spa
 	return parentSpan, carrier["uber-trace-id"], nil
 }
 
-func FinishSpan(span opentracing.Span) {
+func (j *JaegerTracer) FinishSpan(span opentracing.Span) {
 	if span != nil {
 		span.Finish()
 	}
 }
 
-func SpanSetTag(span opentracing.Span, tagKey, tagValue string) {
+func (j *JaegerTracer) SpanSetTag(span opentracing.Span, tagKey, tagValue string) {
 	if span != nil {
 		span.SetTag(tagKey, tagValue)
 	}
