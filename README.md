@@ -22,6 +22,7 @@
 - Redis
 - Mysql
 - RabbitMQ
+- Prometheus
 - Jaeger
 - Docker
 
@@ -41,7 +42,10 @@
 - JWT：JWT的生成和校验
 - Auth：用户密码的加密和校验
 - Minio：封装Minio对象存储的接口，并使用Nginx对多台Minio服务器进行负载均衡
-- Middleware：HTTP中间件
+- Middleware：
+    - Cors
+    - JWT Auth
+    - 使用prometheus收集系统和接口数据，计算接口QPS；并使用Grafana进行数据可视化
 - RabbitMQ: 封装了RabbitMQ的操作接口
 - Timer: 简易定时器，用于redis和mysql的定时同步
 - Tracer: 封装Jaeger接口，基于OpenTracing对服务进行链路追踪
@@ -66,4 +70,12 @@
     <img src="./img/synctrace.png" />
     <h4>Async Tracing</h4>
     <img src="./img/asynctrace.png" />
+</div>
+
+## 服务监控
+<div>
+    <h4>System monitoring</h4>
+    <img src="./img/grafana-os.png" />
+    <h4>API monitoring</h4>
+    <img src="./img/grafana-http.png" />
 </div>
