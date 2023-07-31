@@ -14,8 +14,8 @@ var publishDB dal.PublishDB
 func CreateVideo(userID uint, playName string, coverName string, title string) (uint, error) {
 	videoModel := &dal.Video{
 		AuthorID: userID,
-		PlayURL: playName,
-		CoverURL: coverName,
+		VideoName: playName,
+		CoverName: coverName,
 		Title: title,
 	}
 
@@ -43,12 +43,12 @@ func GetVideoList(userID uint) ([]*publish.Video, error) {
 		}
 		
 		// Get URL from minio
-		videoPlayUrl, err := minio.GetFileURL(minioBucketName, video.PlayURL, 0)
+		videoPlayUrl, err := minio.GetFileURL(minioBucketName, video.VideoName, 0)
 		if err != nil {
 			return nil, err
 		}
 
-		videoCoverUrl, err := minio.GetFileURL(minioBucketName, video.CoverURL, 0)
+		videoCoverUrl, err := minio.GetFileURL(minioBucketName, video.CoverName, 0)
 		if err != nil {
 			return nil, err
 		}

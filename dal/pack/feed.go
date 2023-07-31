@@ -4,6 +4,7 @@ import (
 	"time"
 
 	"github.com/454270186/GoTikTok/dal"
+	"github.com/454270186/GoTikTok/pkg/minio"
 	"github.com/454270186/GoTikTok/rpc/feed/types/feed"
 )
 
@@ -33,6 +34,8 @@ func GetVideoListByTime(limit int, latestTime int64) ([]*feed.Video, int64, erro
 
 // Convert dal videos model to RPC video model
 func convertVideoLists(dalVideos []*dal.Video) ([]*feed.Video, error) {
+	minioBucketName := minio.VideoBucketName
+
 	rpcVideos := make([]*feed.Video, 0)
 	for _, dalVideo := range dalVideos {
 		author, err := userDB.GetById(ctx, dalVideo.AuthorID)
@@ -40,11 +43,21 @@ func convertVideoLists(dalVideos []*dal.Video) ([]*feed.Video, error) {
 			return nil, err
 		}
 
+		videoPlayUrl, err := minio.GetFileURL(minioBucketName, dalVideo.VideoName, 0)
+		if err != nil {
+			return nil, err
+		}
+
+		videoCoverUrl, err := minio.GetFileURL(minioBucketName, dalVideo.CoverName, 0)
+		if err != nil {
+			return nil, err
+		}
+
 		v := feed.Video{
 			Id:            int64(dalVideo.ID),
 			Author:        convertFeedUser(author),
-			PlayUrl:       dalVideo.PlayURL,
-			CoverUrl:      dalVideo.CoverURL,
+			PlayUrl:       videoPlayUrl.String(),
+			CoverUrl:      videoCoverUrl.String(),
 			FavoriteCount: dalVideo.FavoriteCount,
 			CommentCount:  dalVideo.CommentCount,
 			IsFavorite:    false,

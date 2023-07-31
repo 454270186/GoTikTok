@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/454270186/GoTikTok/dal"
+	"github.com/454270186/GoTikTok/pkg/minio"
 	"github.com/454270186/GoTikTok/rpc/favorite/types/favorite"
 )
 
@@ -31,6 +32,8 @@ func GetFavVideosByUserID(userID uint) ([]*favorite.Video, error) {
 }
 
 func convertFavVideos(videos []*dal.Video) ([]*favorite.Video, error) {
+	minioBucketName := minio.VideoBucketName
+
 	if videos == nil {
 		return nil, errors.New("videos is nil")
 	}
@@ -41,12 +44,22 @@ func convertFavVideos(videos []*dal.Video) ([]*favorite.Video, error) {
 		if err != nil {
 			return nil, err
 		}
+		
+		videoPlayUrl, err := minio.GetFileURL(minioBucketName, dalVideo.VideoName, 0)
+		if err != nil {
+			return nil, err
+		}
+
+		videoCoverUrl, err := minio.GetFileURL(minioBucketName, dalVideo.CoverName, 0)
+		if err != nil {
+			return nil, err
+		}
 
 		favVideo := &favorite.Video{
 			Id: int64(dalVideo.ID),
 			Author: convertFavUser(author),
-			PlayUrl: dalVideo.PlayURL,
-			CoverUrl: dalVideo.CoverURL,
+			PlayUrl: videoPlayUrl.String(),
+			CoverUrl: videoCoverUrl.String(),
 			FavoriteCount: dalVideo.FavoriteCount,
 			CommentCount: dalVideo.CommentCount,
 			IsFavorite: true,
