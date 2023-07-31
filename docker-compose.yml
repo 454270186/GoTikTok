@@ -84,24 +84,24 @@ services:
     ports:
       - "9100:9100"
     restart: always
-  prometheus:
-    image: prom/prometheus:latest
-    restart: always
-    ports:
-      - "9090:9090"
-    volumes:
-      - "./config/prometheus.yml:/etc/prometheus/prometheus.yml"
-      - "./prometheus_data:/prometheus"
+  # prometheus:
+  #   image: prom/prometheus:latest
+  #   restart: always
+  #   ports:
+  #     - "9090:9090"
+  #   volumes:
+  #     - "./config/prometheus.yml:/etc/prometheus/prometheus.yml"
+  #     - "./prometheus_data:/prometheus"
 
   # Grafana
-  grafana:
-    image: grafana/grafana:latest
-    environment:
-      - GF_AUTH_ANONYMOUS_ENABLED=true
-      - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
-      - GF_AUTH_DISABLE_LOGIN_FORM=true
-    ports:
-      - "3000:3000"
+  # grafana:
+  #   image: grafana/grafana:latest
+  #   environment:
+  #     - GF_AUTH_ANONYMOUS_ENABLED=true
+  #     - GF_AUTH_ANONYMOUS_ORG_ROLE=Admin
+  #     - GF_AUTH_DISABLE_LOGIN_FORM=true
+  #   ports:
+  #     - "3000:3000"
 
   # starts 4 docker containers running minio server instances.
   # using nginx reverse proxy, load balancing, you can access

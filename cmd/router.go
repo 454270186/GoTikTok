@@ -4,28 +4,19 @@ import (
 	"github.com/454270186/GoTikTok/cmd/handler"
 	"github.com/454270186/GoTikTok/pkg/middleware"
 	"github.com/gin-gonic/gin"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/prometheus/client_golang/prometheus/collectors"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 func NewRouter() *gin.Engine {
 	r := gin.Default()
 
-	// global middleware
+	/* global middleware */
+	// Cors
 	r.Use(middleware.Cors())
-
 	// Prometheus
-	// Create non-global registry.
-	reg := prometheus.NewRegistry()
-
-	// Add go runtime metrics and process collectors.
-	reg.MustRegister(
-		collectors.NewGoCollector(),
-		collectors.NewProcessCollector(collectors.ProcessCollectorOpts{}),
-	)
-
-	r.GET("/metrics", gin.WrapH(promhttp.HandlerFor(reg, promhttp.HandlerOpts{Registry: reg})))
+	// expose prometheus port
+	r.Use(middleware.PrometheusMiddleware())
+	r.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	userHandler := handler.NewUserHandler()
 	publishHandler := handler.NewPubHandler()
