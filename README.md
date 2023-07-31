@@ -42,7 +42,7 @@
 - Middleware：HTTP中间件
 - RabbitMQ: 封装了RabbitMQ的操作接口
 - Timer: 简易定时器，用于redis和mysql的定时同步
-- Tracer: 封装Jaeger接口，基于OpenTelemetry对服务进行链路追踪
+- Tracer: 封装Jaeger接口，基于OpenTracing对服务进行链路追踪
 
 ## 优化
 1. 在Publish RPC Servic中，异步进行Minio的视频上传，若上传失败再删除db中的记录，加快对客户端的响应速度

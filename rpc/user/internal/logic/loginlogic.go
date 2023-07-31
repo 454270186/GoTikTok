@@ -28,19 +28,30 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(in *user.LoginReq) (*user.LoginRes, error) {
-	// todo: add your logic here and delete this line
+	span, traceID, _ := userRPCTracer.StartSpan("RPC: Login", in.TraceID, false)
+	userRPCTracer.SpanSetTag(span, "rpc_addr", "0.0.0.0:8081")
+	defer userRPCTracer.FinishSpan(span)
+
+	mysqlSpan, _, _ := userRPCTracer.DB("Check user exist", traceID, false)
+	userRPCTracer.SpanSetTag(mysqlSpan, "db_operation", "Query")
 	userID, isExist, err := pack.IsUserExist(in.Username)
 	if err != nil {
+		userRPCTracer.FinishSpan(mysqlSpan)
 		return nil, err
 	}
+	userRPCTracer.FinishSpan(mysqlSpan)
 
 	if !isExist {
 		return nil, errors.New("user is not exist")
 	}
 
+	mysqlSpan, _, _ = userRPCTracer.DB("Check user password", traceID, false)
+	userRPCTracer.SpanSetTag(mysqlSpan, "db_operation", "Query")
 	if isPwdOK := pack.CheckPassword(userID, in.Password); !isPwdOK {
+		userRPCTracer.FinishSpan(mysqlSpan)
 		return nil, errors.New("wrong password")
 	}
+	userRPCTracer.FinishSpan(mysqlSpan)
 
 	token, _ := auth.NewTokenByUserID(userID)
 	if token == "" {

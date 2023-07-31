@@ -71,7 +71,6 @@ func (j *JaegerTracer) StartSpan(operationName, parentTracID string, isRoot bool
 		return nil, "", err
 	}
 
-
 	return parentSpan, carrier["uber-trace-id"], nil
 }
 

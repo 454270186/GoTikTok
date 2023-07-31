@@ -34,13 +34,15 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(in *user.RegisterReq) (*user.RegisterRes, error) {
-	span, traceID, _ := userRPCTracer.StartSpan("RPC_Register", in.TraceID, false)
+	span, traceID, _ := userRPCTracer.StartSpan("RPC: Register", in.TraceID, false)
+	userRPCTracer.SpanSetTag(span, "rpc_addr", "0.0.0.0:8081")
 	defer userRPCTracer.FinishSpan(span)
 
 	// encoded user's password
 	encrypted, _ := auth.GetHashedPwd(in.Password)
 
 	mysqlSpan, _, _ := userRPCTracer.StartSpan("DB: Create new user", traceID, false)
+	userRPCTracer.SpanSetTag(mysqlSpan, "db_operation", "Create")
 	newUserID, err := pack.CreateNewUser(in.Username, string(encrypted))
 	if err != nil {
 		userRPCTracer.FinishSpan(mysqlSpan)

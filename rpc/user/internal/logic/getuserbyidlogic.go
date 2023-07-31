@@ -26,28 +26,23 @@ func NewGetUserByIdLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUs
 }
 
 func (l *GetUserByIdLogic) GetUserById(in *user.GetUserReq) (*user.GetUserRes, error) {
-	// todo: add your logic here and delete this line
+	span, traceID, _ := userRPCTracer.StartSpan("RPC: Login", in.TraceID, false)
+	userRPCTracer.SpanSetTag(span, "rpc_addr", "0.0.0.0:8081")
+	defer userRPCTracer.FinishSpan(span)
+
 	userId, err := strconv.ParseUint(in.UserId, 10, 64)
 	if err != nil {
 		return nil, err
 	}
 
-	// DBUser, err := UserDB.GetById(l.ctx, uint(userId))
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// gotUser := user.User{
-	// 	Id: int64(DBUser.ID),
-	// 	Name: DBUser.Username,
-	// 	FollowCount: DBUser.FollowerCount,
-	// 	FollowerCount: DBUser.FollowerCount,
-	// }
-
+	mysqlSpan, _, _ := userRPCTracer.DB("GetUserByID", traceID, false)
+	userRPCTracer.SpanSetTag(mysqlSpan, "db_operation", "Query")
 	gotUser, err := pack.GetUserByID(userId)
 	if err != nil {
+		userRPCTracer.FinishSpan(mysqlSpan)
 		return nil, err
 	}
+	userRPCTracer.FinishSpan(mysqlSpan)
 
 	return &user.GetUserRes{
 		StatusCode: 0,
