@@ -58,30 +58,42 @@ services:
       - "14250:14250"
       - "6831:6831/udp"
 
-  # Victoriametrics
-  # open source time series database & monitoring solution
-  victoriametrics:
-    container_name: victoriametrics
-    image: victoriametrics/victoria-metrics
+  # # Victoriametrics
+  # # open source time series database & monitoring solution
+  # victoriametrics:
+  #   container_name: victoriametrics
+  #   image: victoriametrics/victoria-metrics
+  #   ports:
+  #     - "8428:8428"
+  #     - "8089:8089"
+  #     - "8089:8089/udp"
+  #     - "2003:2003"
+  #     - "2003:2003/udp"
+  #     - "4242:4242"
+  #   command:
+  #     - '--storageDataPath=/storage'
+  #     - '--graphiteListenAddr=:2003'
+  #     - '--opentsdbListenAddr=:4242'
+  #     - '--httpListenAddr=:8428'
+  #     - '--influxListenAddr=:8089'
+  #   restart: always
+
+  # Prometheus
+  node-exporter:
+    image: prom/node-exporter:latest
     ports:
-      - "8428:8428"
-      - "8089:8089"
-      - "8089:8089/udp"
-      - "2003:2003"
-      - "2003:2003/udp"
-      - "4242:4242"
-    command:
-      - '--storageDataPath=/storage'
-      - '--graphiteListenAddr=:2003'
-      - '--opentsdbListenAddr=:4242'
-      - '--httpListenAddr=:8428'
-      - '--influxListenAddr=:8089'
+      - "9100:9100"
     restart: always
+  prometheus:
+    image: prom/prometheus:latest
+    restart: always
+    ports:
+      - "9090:9090"
+    volumes:
+      - "./config/prometheus.yml:/etc/prometheus/prometheus.yml"
+      - "./prometheus_data:/prometheus"
 
   # Grafana
-  # 数据可视化工具，数据监控，数据统计
-  # “3000:3000"表示端口映射
-  # 第一个为外部端口，第一个为内部端口号
   grafana:
     image: grafana/grafana:latest
     environment:

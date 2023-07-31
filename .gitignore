@@ -9,3 +9,6 @@ log
 
 # env file
 .env
+
+# Prometeus data
+prometheus_data
