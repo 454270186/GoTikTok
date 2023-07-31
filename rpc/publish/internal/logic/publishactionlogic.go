@@ -27,6 +27,10 @@ func NewPublishActionLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Pub
 }
 
 func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publish.PublishActionRes, error) {
+	span, traceID, _ := pubRPCTracer.StartSpan("RPC: Action", in.TraceID, false)
+	defer pubRPCTracer.FinishSpan(span)
+	pubRPCTracer.SpanSetTag(span, "rpc_addr", "0.0.0.0:8080")
+	
 	MinioVideoBucketName := minio.VideoBucketName
 	videoData := in.Data
 
@@ -44,19 +48,28 @@ func (l *PublishActionLogic) PublishAction(in *publish.PublishActionReq) (*publi
 	coverFileName := coveruuid.String() + "." + "mp4"
 
 	// store video in database
+	mysqlSpan, _, _ := pubRPCTracer.DB("Create new video", traceID, false)
+	pubRPCTracer.SpanSetTag(mysqlSpan, "db_operation", "Create")
 	newVideoID, err := pack.CreateVideo(uint(in.Uid), videoFileName, coverFileName, in.Title)
 	if err != nil {
+		pubRPCTracer.FinishSpan(mysqlSpan)
 		return nil, err
 	}
+	pubRPCTracer.FinishSpan(mysqlSpan)
 
 	// async upload video to minio
+	asyncSpan, _, _ := pubRPCTracer.StartSpan("Minio: Async upload video", traceID, false)
+	pubRPCTracer.SpanSetTag(asyncSpan, "minio_addr", minio.MinioEndpoint)
 	go func () {
 		err := minio.UploadVideo(MinioVideoBucketName, videoFileName, coverFileName, videoData)
 		if err != nil {
 			// if upload failed, delete video record in mysql
 			_ = pack.DelVideoByID(newVideoID)
+			pubRPCTracer.SpanSetTag(asyncSpan, "minio_error", err.Error())
+			pubRPCTracer.FinishSpan(asyncSpan)
 			return
 		}
+		pubRPCTracer.FinishSpan(asyncSpan)
 	}()
 
 	return &publish.PublishActionRes{

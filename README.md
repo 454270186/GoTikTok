@@ -45,7 +45,7 @@
 - Tracer: 封装Jaeger接口，基于OpenTracing对服务进行链路追踪
 
 ## 优化
-1. 在Publish RPC Servic中，异步进行Minio的视频上传，若上传失败再删除db中的记录，加快对客户端的响应速度
+1. 在Publish RPC Servic中，异步进行Minio的视频上传，若上传失败再删除db中的记录，加快对客户端的响应速度 (测试结果：提升接口近一倍的响应速度)
 2. 对于可能压力较大的接口(如点赞，关注)， 使用rabiitmq异步处理，并使用redis作为缓存，定时与mysql同步
 3. 采用自旋的方式实现简单的redis分布式锁
 
@@ -56,4 +56,12 @@
 <div style="display: flex;">
     <img src="./img/gotiktok1.jpg" alt="Image 1" style="width: 45%; margin-right: 5%;" />
     <img src="./img/gotiktok2.png" alt="Image 2" style="width: 45%; margin-right: 5%;" />
+</div>
+
+## 链路追踪
+<div>
+    <h4>Sync Tracing</h4>
+    <img src="./img/synctrace.png" />
+    <h4>Async Tracing</h4>
+    <img src="./img/asynctrace.png" />
 </div>
