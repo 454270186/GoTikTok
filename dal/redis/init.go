@@ -4,7 +4,6 @@ import (
 	"sync"
 	"time"
 
-	//"github.com/454270186/GoTikTok/pkg/timer"
 	"github.com/454270186/GoTikTok/pkg/timer"
 	"github.com/joho/godotenv"
 	r "github.com/redis/go-redis/v9"

@@ -5,7 +5,7 @@ import (
 	"time"
 )
 
-// redis operation logic
+/* redis operation logic */
 
 // Put a K-V with no expiration
 func PutKey(ctx context.Context, key string, val any) error {

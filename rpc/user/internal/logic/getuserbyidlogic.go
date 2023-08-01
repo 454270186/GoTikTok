@@ -26,7 +26,7 @@ func NewGetUserByIdLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUs
 }
 
 func (l *GetUserByIdLogic) GetUserById(in *user.GetUserReq) (*user.GetUserRes, error) {
-	span, traceID, _ := userRPCTracer.StartSpan("RPC: Login", in.TraceID, false)
+	span, traceID, _ := userRPCTracer.StartSpan("RPC: Get User by ID", in.TraceID, false)
 	userRPCTracer.SpanSetTag(span, "rpc_addr", "0.0.0.0:8081")
 	defer userRPCTracer.FinishSpan(span)
 
