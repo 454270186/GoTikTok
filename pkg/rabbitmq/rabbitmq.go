@@ -45,7 +45,7 @@ func (r *RabbitMQ) PubWithCtx(ctx context.Context, body []byte) error {
 	}
 
 	err = r.channel.PublishWithContext(ctx, 
-		"", // user default exchange
+		"", // use default exchange
 		r.QueueName,
 		false,
 		false,
