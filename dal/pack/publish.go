@@ -4,6 +4,8 @@ import (
 	"github.com/454270186/GoTikTok/dal"
 	"github.com/454270186/GoTikTok/pkg/minio"
 	"github.com/454270186/GoTikTok/rpc/publish/types/publish"
+
+	"gorm.io/gorm"
 )
 
 var publishDB dal.PublishDB
@@ -13,24 +15,75 @@ var publishDB dal.PublishDB
 // Change return (error) to return (newVideoID, error)
 func CreateVideo(userID uint, playName string, coverName string, title string) (uint, error) {
 	videoModel := &dal.Video{
-		AuthorID: userID,
+		AuthorID:  userID,
 		VideoName: playName,
 		CoverName: coverName,
-		Title: title,
+		Title:     title,
 	}
 
-	return publishDB.CreateVideo(ctx, videoModel)
+	err := publishDB.DB.Transaction(func(tx *gorm.DB) error {
+		// Create video record
+		err := tx.Create(videoModel).Error
+		if err != nil {
+			return err
+		}
+
+		// add user work count
+		user := dal.User{ID: userID}
+		err = tx.First(&user).Error
+		if err != nil {
+			return err
+		}
+
+		user.WorkCount++
+
+		err = tx.Save(&user).Error
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
+	if err != nil {
+		return 0, err
+	}
+
+	return videoModel.ID, nil
 }
 
 func DelVideoByID(videoID uint) error {
-	return publishDB.DelByID(ctx, videoID)
+	return publishDB.DB.Transaction(func(tx *gorm.DB) error {
+		delVideo := dal.Video{ID: videoID}
+		if err := tx.First(&delVideo).Error; err != nil {
+			return err
+		}
+
+		if err := tx.Delete(&delVideo).Error; err != nil {
+			return err
+		}
+
+		user := dal.User{ID: delVideo.AuthorID}
+		err := tx.First(&user).Error
+		if err != nil {
+			return err
+		}
+
+		user.WorkCount--
+
+		err = tx.Save(&user).Error
+		if err != nil {
+			return err
+		}
+
+		return nil
+	})
 }
 
 func GetVideoList(userID uint) ([]*publish.Video, error) {
 	minioBucketName := minio.VideoBucketName
 
 	videoList := []*publish.Video{}
-	
+
 	dalVideoList, err := publishDB.GetListByID(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -41,7 +94,7 @@ func GetVideoList(userID uint) ([]*publish.Video, error) {
 		if err != nil {
 			return nil, err
 		}
-		
+
 		// Get URL from minio
 		videoPlayUrl, err := minio.GetFileURL(minioBucketName, video.VideoName, 0)
 		if err != nil {
@@ -54,14 +107,14 @@ func GetVideoList(userID uint) ([]*publish.Video, error) {
 		}
 
 		pVideo := &publish.Video{
-			Id: int64(video.ID),
-			Author: convertUser(author),
-			PlayUrl: videoPlayUrl.String(),
-			CoverUrl: videoCoverUrl.String(),
+			Id:            int64(video.ID),
+			Author:        convertUser(author),
+			PlayUrl:       videoPlayUrl.String(),
+			CoverUrl:      videoCoverUrl.String(),
 			FavoriteCount: video.FavoriteCount,
-			CommentCount: video.CommentCount,
-			IsFavorite: false,
-			Title: video.Title,
+			CommentCount:  video.CommentCount,
+			IsFavorite:    false,
+			Title:         video.Title,
 		}
 
 		videoList = append(videoList, pVideo)
@@ -82,5 +135,6 @@ func convertUser(dalUser *dal.User) *publish.User {
 		FollowCount:   dalUser.FollowingCount,
 		FollowerCount: dalUser.FollowerCount,
 		IsFollow:      true,
+		WorkCount:     dalUser.WorkCount,
 	}
 }

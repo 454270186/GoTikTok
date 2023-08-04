@@ -8,6 +8,7 @@ type User struct {
 	Password       string `gorm:"column:password"`
 	FollowingCount int64  `gorm:"default:0;column:following_count"`
 	FollowerCount  int64  `gorm:"default:0;column:follower_count"`
+	WorkCount      int64  `gorm:"default:0;column:work_count"`
 	CreatedAt      time.Time
 	UpdatedAt      time.Time
 }

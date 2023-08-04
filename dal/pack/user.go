@@ -31,6 +31,7 @@ func GetUserByID(userID uint64) (*user.User, error) {
 		FollowCount: dalUser.FollowingCount,
 		FollowerCount: dalUser.FollowerCount,
 		IsFollow: false,
+		WorkCount: dalUser.WorkCount,
 	}, nil
 }
 

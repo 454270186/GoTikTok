@@ -47,3 +47,20 @@ func (u UserDB) IsUserExist(ctx context.Context, username string) (uint, bool, e
 
 	return user.ID, true, nil
 }
+
+func (u UserDB) AddWorkCount(ctx context.Context, userID uint) error {
+	user := User{ID: userID}
+	err := u.DB.WithContext(ctx).First(&user).Error
+	if err != nil {
+		return err
+	}
+
+	user.WorkCount++
+
+	err = u.DB.WithContext(ctx).Save(&user).Error
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
