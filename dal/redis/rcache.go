@@ -36,8 +36,7 @@ import (
 // Key:   video::{videoID}::user::{userID}
 // Value: {action_type}::{created_at}
 func UpdateVideo(ctx context.Context, favOp *rmodel.FavoriteCache) error {
-	Lock() 
-
+	Lock()
 	likeKey := fmt.Sprintf("video::%d::user::%d", favOp.VideoID, favOp.UserID)
 	likeValue := fmt.Sprintf("%d::%d", favOp.ActionType, favOp.CreatedAt)
 
