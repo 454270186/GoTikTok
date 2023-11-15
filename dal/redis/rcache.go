@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/454270186/GoTikTok/dal/redis/locker"
 	"github.com/454270186/GoTikTok/dal/redis/rmodel"
 )
 
@@ -36,36 +37,37 @@ import (
 // Key:   video::{videoID}::user::{userID}
 // Value: {action_type}::{created_at}
 func UpdateVideo(ctx context.Context, favOp *rmodel.FavoriteCache) error {
-	Lock()
+	Locker := locker.NewLocker(GetLockerRDB(), locker.TTL, locker.TrylockInterval)
+	Lock := Locker.GetLock("LikeLock")
+
+	err := Lock.Lock(ctx)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	defer Lock.Unlock(ctx)
+
 	likeKey := fmt.Sprintf("video::%d::user::%d", favOp.VideoID, favOp.UserID)
 	likeValue := fmt.Sprintf("%d::%d", favOp.ActionType, favOp.CreatedAt)
 
 	isExist, err := GetRDB().Exists(ctx, likeKey).Result()
 	if err != nil {
-		Unlock()
 		return errors.New("error while check key exist" + err.Error())
 	}
-	Unlock()
 
 	if isExist == 0 {
 		// key is not exist, add to redis
-		Lock()
-
-		err := PutKey(ctx, likeKey, likeValue)
+		err = PutKey(ctx, likeKey, likeValue)
 		if err != nil {
 			return errors.New("error while put likekey: " + err.Error())
 		}
 
-		Unlock()
 		return nil
 	} else {		
-		Lock()
-
 		// key is exist, check for update
 		res, err := Get(ctx, likeKey)
 		if err != nil {
 			log.Println(err)
-			Unlock()
 			return errors.New("error while get key" + err.Error())
 		}
 
@@ -76,7 +78,6 @@ func UpdateVideo(ctx context.Context, favOp *rmodel.FavoriteCache) error {
 		log.Println(rActionType, favOp.ActionType)
 		if rActionType == actionType {
 			// if action type is same, return
-			Unlock()
 			return nil
 		}
 
@@ -84,23 +85,19 @@ func UpdateVideo(ctx context.Context, favOp *rmodel.FavoriteCache) error {
 		rCreatedAtUnix, err := strconv.Atoi(rCreatedAt)
 		if err != nil {
 			log.Println(err)
-			Unlock()
 			return errors.New("error while convert str to int: " + err.Error())
 		}
 		if rCreatedAtUnix >= int(favOp.CreatedAt) {
 			// the record opretion is later than this operation, return
-			Unlock()
 			return nil
 		}
 
 		// Update record
 		err = PutKey(ctx, likeKey, likeValue)
 		if err != nil {
-			Unlock()
 			return err
 		}
 	}
 	
-	Unlock()
 	return nil
 }

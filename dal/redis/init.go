@@ -1,6 +1,8 @@
 package redis
 
 import (
+	"context"
+	"log"
 	"sync"
 	"time"
 
@@ -12,12 +14,13 @@ import (
 var (
 	RedisAddr string
 	RedisPassword string
-
-	SyncDuration = 5 * time.Second
+	LockerAddr string
+	SyncDuration = 2 * time.Second
 )
 
 var (
 	rdb *r.Client
+	lockerRdb *r.Client
 	redisInitOnce sync.Once
 )
 
@@ -29,6 +32,7 @@ func init() {
 
 	RedisAddr = rdbEnv["R_ADDR"]
 	RedisPassword = rdbEnv["R_PSW"]
+	LockerAddr = rdbEnv["R_LOCKER_ADDR"]
 
 	timer.SyncTimer(SyncDuration, MoveFavoriteToDB)
 }
@@ -46,4 +50,24 @@ func GetRDB() *r.Client {
 	}
 
 	return rdb
+}
+
+func GetLockerRDB() *r.Client {
+	if lockerRdb != nil {
+		return lockerRdb
+	}
+
+	log.Println("locker addr:", LockerAddr)
+	lockerRdb = r.NewClient(&r.Options{
+		Addr: LockerAddr,
+		Password: RedisPassword,
+		DB: 0,
+	})
+
+	_, err := lockerRdb.Ping(context.Background()).Result()
+	if err != nil {
+		panic(err)
+	}
+	log.Println("Locker RDB initialized")
+	return lockerRdb
 }
